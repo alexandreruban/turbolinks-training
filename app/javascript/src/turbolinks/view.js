@@ -4,9 +4,7 @@ Turbolinks.View = class View{
   }
 
   loadHTML(html) {
-    parsedHTML = this.parseHTML(html)
-    const title = parsedHTML.title
-    const body = parsedHTML.body
+    const { title, body } = this.parseHTML(html)
     this.loadTitle(title)
     this.loadBody(body)
   }
