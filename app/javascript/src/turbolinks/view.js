@@ -11,17 +11,12 @@ Turbolinks.View = class View{
     document.title = snapshot.title
     document.body  = snapshot.body
 
-    if (snapshot.offsets && snapshot.offsets.left) {
-      window.pageXOffset = snapshot.offsets.left
-    } else {
-      window.pageXOffset = 0
-    }
+    const xOffset =
+      (snapshot.offsets && snapshot.offsets.left) ? snapshot.offsets.left : 0
+    const yOffset =
+      (snapshot.offsets && snapshot.offsets.top)  ? snapshot.offsets.top  : 0
 
-    if (snapshot.offsets && snapshot.offsets.top) {
-      window.pageXOffset = snapshot.offsets.top
-    } else {
-      window.pageYOffset = 0
-    }
+    scroll(xOffset, yOffset)
   }
 
   saveSnapshot() {

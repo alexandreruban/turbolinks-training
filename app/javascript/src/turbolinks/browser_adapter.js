@@ -18,9 +18,7 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   // Private
 
   request(url) {
-    if (this.xhr) {
-      this.xhr.abort()
-    }
+    if (this.xhr) { this.xhr.abort() }
     this.xhr = new XMLHttpRequest
     this.xhr.open("GET", url, true)
     this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
@@ -31,6 +29,7 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
 
   requestLoaded = () => {
     this.delegate.adapterLoadedResponse(this.xhr.responseText)
+    this.xhr = null
   }
 
   requestFailed = () => {
