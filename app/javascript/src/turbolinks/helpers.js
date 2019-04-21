@@ -1,22 +1,26 @@
 Turbolinks.closest = (element, selector) => {
-  return closest.call(element, selector)
+  return closest().call(element, selector)
 }
 
 const closest = () => {
   html = document.documentElement
-  return html.closest != null ? html.closest : (selector) => {
-    let node = this
-    while (node) {
-      if (node.nodeType === Node.ELEMENT_NODE && match.call(node, selector)) {
-        return node
+
+  if (html.closest) {
+    return html.closest != null ? html.closest : (selector) => {
+      node = this
+      while (node) {
+        if (node && node.nodeType === Node.ELEMENT_NODE && match().call(node, selector)) {
+          return node
+        } else {
+          node = node.parentNode
+        }
       }
-      node = node.parentNode
     }
   }
 }
 
 Turbolinks.match = (element, selector) => {
-  return match.call(element, selector)
+  return match().call(element, selector)
 }
 
 const match = () => {

@@ -47,18 +47,18 @@ Turbolinks.Controller = class Controller {
 
   // Event handlers
 
-  historyPopped(event) {
+  historyPopped = (event) => {
     if (event.state && event.state.turbolinks) {
       this.locationChanged(location.toString())
     }
   }
 
-  clickCaptured() {
+  clickCaptured = () => {
     removeEventListener("click", this.clickBubbled, false)
     addEventListener("click", this.clickBubbled, false)
   }
 
-  clickBubbled(event) {
+  clickBubbled = (event) => {
     const url = this.getVisitableURLForEvent(event)
 
     if (!event.defaultPrevented && url) {
@@ -76,7 +76,7 @@ Turbolinks.Controller = class Controller {
   getVisitableURLForEvent(event) {
     const link = Turbolinks.closest(event.target, "a")
 
-    if (link && link.href && isSameOrigin(link.href)) {
+    if (link && link.href && this.isSameOrigin(link.href)) {
       return link.href
     }
   }
@@ -87,4 +87,4 @@ Turbolinks.Controller = class Controller {
 }
 
 Turbolinks.controller = new Turbolinks.Controller(Turbolinks.BrowserAdapter)
-Turbolinks.controller.start
+Turbolinks.controller.start()
