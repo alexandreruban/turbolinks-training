@@ -1,5 +1,6 @@
 import "../src/turbolinks";
 import "../src/turbolinks/helpers";
+import "../src/turbolinks/cache";
 import "../src/turbolinks/view";
 import "../src/turbolinks/history";
 import "../src/turbolinks/browser_adapter";

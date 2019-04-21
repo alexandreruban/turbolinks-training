@@ -3,6 +3,8 @@ Turbolinks.Controller = class Controller {
     this.adapter = new adapterConstructor(this)
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
+    this.cache = new Turbolinks.Cache(this)
+    this.url = location.toString()
   }
 
   start() {
@@ -26,6 +28,7 @@ Turbolinks.Controller = class Controller {
   }
 
   loadResponse(response) {
+    console.log(`loading response for ${this.url}`)
     this.view.loadHTML(response)
   }
 
@@ -69,8 +72,26 @@ Turbolinks.Controller = class Controller {
 
   // Private
 
+  saveSnapshot() {
+    console.log(`saving snapshot for ${this.url}`)
+    const snapshot = this.view.saveSnapshot()
+    this.cache.put(this.url, snapshot)
+  }
+
+  restoreSnapshot() {
+    const snapshot = this.cache.get(this.url)
+
+    if (snapshot) {
+      console.log(`restoring snapshot for ${this.url}`)
+      this.view.loadSnapshot(snapshot)
+    }
+  }
+
   locationChanged(url) {
+    this.saveSnapshot()
+    this.url = url
     this.adapter.locationChanged(url)
+    this.restoreSnapshot()
   }
 
   getVisitableURLForEvent(event) {
