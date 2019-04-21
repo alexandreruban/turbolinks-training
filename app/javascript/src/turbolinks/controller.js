@@ -84,6 +84,7 @@ Turbolinks.Controller = class Controller {
     if (snapshot) {
       console.log(`restoring snapshot for ${this.url}`)
       this.view.loadSnapshot(snapshot)
+      this.adapter.snapshotRestored()
     }
   }
 

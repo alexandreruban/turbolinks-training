@@ -11,6 +11,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
     this.request(url)
   }
 
+  snapshotRestored() {
+
+  }
+
   // Private
 
   request(url) {
