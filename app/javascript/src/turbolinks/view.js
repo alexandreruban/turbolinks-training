@@ -4,17 +4,22 @@ Turbolinks.View = class View{
   }
 
   loadHTML(html) {
-    this.loadSnapshot(this.parseHTML(html))
+    this.loadSnapshotWithScrollPosition(this.parseHTML(html), "anchored")
   }
 
-  loadSnapshot(snapshot) {
+  loadSnapshotWithScrollPosition(snapshot, scrollPosition) {
     document.title = snapshot.title
     document.body  = snapshot.body
 
-    const xOffset =
-      (snapshot.offsets && snapshot.offsets.left) ? snapshot.offsets.left : 0
-    const yOffset =
-      (snapshot.offsets && snapshot.offsets.top)  ? snapshot.offsets.top  : 0
+    if (scrollPosition === "restored" && snapshot && snapshot.offsets) {
+      const xOffset = snapshot.offsets.left
+      const yOffset = snapshot.offsets.top
+      scrollTo(xOffset, yOffset)
+    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
+      document.querySelector(window.location.hash).scrollIntoView()
+    } else {
+      scrollTo(0, 0)
+    }
 
     scroll(xOffset, yOffset)
   }

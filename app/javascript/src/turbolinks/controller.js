@@ -47,12 +47,12 @@ Turbolinks.Controller = class Controller {
     this.cache.put(this.location, snapshot)
   }
 
-  restoreSnapshot() {
+  restoreSnapshotWithScrollPosition(scrollPosition) {
     const snapshot = this.cache.get(this.url)
 
     if (snapshot) {
       console.log(`restoring snapshot for ${this.url}`)
-      this.view.loadSnapshot(snapshot)
+      this.view.loadSnapshotWithScrollPosition(snapshot, scrollPosition)
       return true
     }
   }
