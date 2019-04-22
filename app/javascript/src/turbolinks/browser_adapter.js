@@ -1,14 +1,15 @@
 Turbolinks.BrowserAdapter = class BrowserAdapter {
-  constructor(delegate) {
-    this.delegate = delegate
+  constructor(controller) {
+    this.controller = controller
   }
 
-  visitLocation(url) {
-    this.delegate.getHistoryForAdapter().push(url)
+  visitLocation(location) {
+    this.controller.pushHistory(location)
   }
 
-  locationChanged(url) {
-    this.request(url)
+  locationChanged(location) {
+    this.issueRequestForLocation(location)
+    this.controller.restoreSnapshot()
   }
 
   snapshotRestored() {
@@ -17,10 +18,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
 
   // Private
 
-  request(url) {
+  issueRequestForLocation(location) {
     if (this.xhr) { this.xhr.abort() }
     this.xhr = new XMLHttpRequest
-    this.xhr.open("GET", url, true)
+    this.xhr.open("GET", location, true)
     this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
     this.xhr.onload = this.requestLoaded
     this.xhr.onerror = this.requestFailed
@@ -28,7 +29,7 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   }
 
   requestLoaded = () => {
-    this.delegate.adapterLoadedResponse(this.xhr.responseText)
+    this.controller.loadResponse(this.xhr.responseText)
     this.xhr = null
   }
 

@@ -4,24 +4,24 @@ Turbolinks.History = class History {
     this.state = { turbolinks: true }
   }
 
-  push(url) {
+  push(location) {
     if (!this.initialized) {
       this.update("replace", null)
       this.initialized = true
     }
 
-    this.update("push", url)
-    this.delegate.historyChanged(url)
+    this.update("push", location)
+    this.delegate.historyChanged(location)
   }
 
-  replace(url) {
-    this.update("replace", url)
-    this.delegate.historyChanged(url)
+  replace(location) {
+    this.update("replace", location)
+    this.delegate.historyChanged(location)
   }
 
   // Private
 
-  update(method, url) {
-    history[method + "State"](this.state, null, url)
+  update(method, location) {
+    history[method + "State"](this.state, null, location)
   }
 }

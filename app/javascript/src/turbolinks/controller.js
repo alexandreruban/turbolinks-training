@@ -4,7 +4,7 @@ Turbolinks.Controller = class Controller {
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
     this.cache = new Turbolinks.Cache(this)
-    this.url = location.toString()
+    this.location = window.location.toString()
   }
 
   start() {
@@ -23,36 +23,52 @@ Turbolinks.Controller = class Controller {
     }
   }
 
-  visit(url) {
-    this.adapter.visitLocation(url)
+  visit(location) {
+    this.adapter.visitLocation(location)
+  }
+
+  pushHistory(location) {
+    this.history.push(location)
+  }
+
+  replaceHistory(location) {
+    this.thistory.replace(location)
   }
 
   loadResponse(response) {
-    console.log(`loading response for ${this.url}`)
+    console.log(`loading response for ${this.location}`)
     this.view.loadHTML(response)
   }
 
-  // Adapter delegate
+  // Page snapshots
 
-  adapterLoadedResponse(response) {
-    return this.loadResponse(response)
+  saveSnapshot() {
+    console.log(`saving snapshot for ${this.url}`)
+    const snapshot = this.view.saveSnapshot()
+    this.cache.put(this.location, snapshot)
   }
 
-  getHistoryForAdapter(adapter) {
-    return this.history
+  restoreSnapshot() {
+    const snapshot = this.cache.get(this.url)
+
+    if (snapshot) {
+      console.log(`restoring snapshot for ${this.url}`)
+      this.view.loadSnapshot(snapshot)
+      return true
+    }
   }
 
   // History delegate
 
-  historyChanged(url) {
-    this.locationChanged(url)
+  historyChanged(location) {
+    this.locationChanged(location)
   }
 
   // Event handlers
 
   historyPopped = (event) => {
     if (event.state && event.state.turbolinks) {
-      this.locationChanged(location.toString())
+      this.locationChanged(window.location.toString())
     }
   }
 
@@ -72,27 +88,10 @@ Turbolinks.Controller = class Controller {
 
   // Private
 
-  saveSnapshot() {
-    console.log(`saving snapshot for ${this.url}`)
-    const snapshot = this.view.saveSnapshot()
-    this.cache.put(this.url, snapshot)
-  }
-
-  restoreSnapshot() {
-    const snapshot = this.cache.get(this.url)
-
-    if (snapshot) {
-      console.log(`restoring snapshot for ${this.url}`)
-      this.view.loadSnapshot(snapshot)
-      this.adapter.snapshotRestored()
-    }
-  }
-
-  locationChanged(url) {
+  locationChanged(location) {
     this.saveSnapshot()
-    this.url = url
-    this.adapter.locationChanged(url)
-    this.restoreSnapshot()
+    this.location = location
+    this.adapter.locationChanged(location)
   }
 
   getVisitableURLForEvent(event) {

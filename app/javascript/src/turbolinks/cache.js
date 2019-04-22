@@ -3,11 +3,11 @@ Turbolinks.Cache = class Cache {
     this.entries = {}
   }
 
-  put(url, snapshot) {
-    return this.entries[url] = snapshot
+  put(location, snapshot) {
+    return this.entries[location] = snapshot
   }
 
-  get(url) {
-    return this.entries[url]
+  get(location) {
+    return this.entries[location]
   }
 }
