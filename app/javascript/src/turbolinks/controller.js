@@ -1,6 +1,5 @@
 Turbolinks.Controller = class Controller {
-  constructor(adapterConstructor) {
-    this.adapter = new adapterConstructor(this)
+  constructor() {
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
     this.cache = new Turbolinks.Cache(this)
@@ -108,4 +107,5 @@ Turbolinks.Controller = class Controller {
 }
 
 Turbolinks.controller = new Turbolinks.Controller(Turbolinks.BrowserAdapter)
+Turbolinks.controller.adapter = new Turbolinks.BrowserAdapter(Turbolinks.controller)
 Turbolinks.controller.start()
