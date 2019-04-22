@@ -42,16 +42,16 @@ Turbolinks.Controller = class Controller {
   // Page snapshots
 
   saveSnapshot() {
-    console.log(`saving snapshot for ${this.url}`)
+    console.log(`saving snapshot for ${this.location}`)
     const snapshot = this.view.saveSnapshot()
     this.cache.put(this.location, snapshot)
   }
 
   restoreSnapshotByScrollingToSavedPosition(scrollToSavedPosition) {
-    const snapshot = this.cache.get(this.url)
+    const snapshot = this.cache.get(this.location)
 
     if (snapshot) {
-      console.log(`restoring snapshot for ${this.url}`)
+      console.log(`restoring snapshot for ${this.location}`)
       this.view.loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition)
       return true
     }
