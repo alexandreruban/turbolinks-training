@@ -7,9 +7,9 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
     this.controller.pushHistory(location)
   }
 
-  locationChanged(location) {
+  locationChangedByActor(location, actor) {
+    this.controller.restoreSnapshotByScrollingToSavedPosition(actor === "history")
     this.issueRequestForLocation(location)
-    this.controller.restoreSnapshot()
   }
 
   snapshotRestored() {

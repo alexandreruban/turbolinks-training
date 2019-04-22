@@ -47,12 +47,12 @@ Turbolinks.Controller = class Controller {
     this.cache.put(this.location, snapshot)
   }
 
-  restoreSnapshotWithScrollPosition(scrollPosition) {
+  restoreSnapshotByScrollingToSavedPosition(scrollToSavedPosition) {
     const snapshot = this.cache.get(this.url)
 
     if (snapshot) {
       console.log(`restoring snapshot for ${this.url}`)
-      this.view.loadSnapshotWithScrollPosition(snapshot, scrollPosition)
+      this.view.loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition)
       return true
     }
   }
@@ -60,14 +60,14 @@ Turbolinks.Controller = class Controller {
   // History delegate
 
   historyChanged(location) {
-    this.locationChanged(location)
+    this.locationChangedByActor(location, "application")
   }
 
   // Event handlers
 
   historyPopped = (event) => {
     if (event.state && event.state.turbolinks) {
-      this.locationChanged(window.location.toString())
+      this.locationChangedByActor(window.location.toString(), "history")
     }
   }
 
@@ -87,10 +87,10 @@ Turbolinks.Controller = class Controller {
 
   // Private
 
-  locationChanged(location) {
+  locationChangedByActor(location, actor) {
     this.saveSnapshot()
     this.location = location
-    this.adapter.locationChanged(location)
+    this.adapter.locationChangedByActor(location, actor)
   }
 
   getVisitableURLForEvent(event) {

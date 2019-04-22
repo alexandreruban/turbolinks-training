@@ -4,24 +4,13 @@ Turbolinks.View = class View{
   }
 
   loadHTML(html) {
-    this.loadSnapshotWithScrollPosition(this.parseHTML(html), "anchored")
+    this.loadSnapshotByScrollingToSavedPosition(this.parseHTML(html), "anchor")
   }
 
-  loadSnapshotWithScrollPosition(snapshot, scrollPosition) {
+  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition) {
     document.title = snapshot.title
     document.body  = snapshot.body
-
-    if (scrollPosition === "restored" && snapshot && snapshot.offsets) {
-      const xOffset = snapshot.offsets.left
-      const yOffset = snapshot.offsets.top
-      scrollTo(xOffset, yOffset)
-    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
-      document.querySelector(window.location.hash).scrollIntoView()
-    } else {
-      scrollTo(0, 0)
-    }
-
-    scroll(xOffset, yOffset)
+    this.scrollToSavedPositionWithOffsets(scrollToSavedPosition, snapshot.offsets)
   }
 
   saveSnapshot() {
@@ -36,6 +25,22 @@ Turbolinks.View = class View{
   }
 
   // Private
+
+  scrollToSavedPositionWithOffsets(scrollToSavedPosition, snapshotOffsets) {
+    const location = window.location.toString()
+
+    if (scrollToSavedPosition && snapshotOffsets) {
+      const xOffset = snapshotOffsets.left || 0
+      const yOffset = snapshotOffsets.top  || 0
+      scrollTo(xOffset, yOffset)
+    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
+      document.querySelector(window.location.hash).scrollIntoView()
+    } else {
+      scrollTo(0, 0)
+    }
+
+    this.lastScrolledLocation = location
+  }
 
   parseHTML(html) {
     element = document.createElement("html")
