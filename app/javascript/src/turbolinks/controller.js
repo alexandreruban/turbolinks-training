@@ -77,11 +77,11 @@ Turbolinks.Controller = class Controller {
   }
 
   clickBubbled = (event) => {
-    const url = this.getVisitableURLForEvent(event)
+    const location = this.getVisitableLocationForEvent(event)
 
-    if (!event.defaultPrevented && url) {
+    if (!event.defaultPrevented && location) {
       event.preventDefault()
-      this.visit(url)
+      this.visit(location)
     }
   }
 
@@ -93,7 +93,7 @@ Turbolinks.Controller = class Controller {
     this.adapter.locationChangedByActor(location, actor)
   }
 
-  getVisitableURLForEvent(event) {
+  getVisitableLocationForEvent(event) {
     const link = Turbolinks.closest(event.target, "a")
 
     if (link && link.href && this.isSameOrigin(link.href)) {
