@@ -2,7 +2,7 @@ Turbolinks.Controller = class Controller {
   constructor() {
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
-    this.cache = new Turbolinks.Cache(this)
+    this.cache = new Turbolinks.Cache(10)
     this.location = Turbolinks.Location.box(window.location)
   }
 
@@ -88,12 +88,7 @@ Turbolinks.Controller = class Controller {
   }
 
   hasSnapshotForLocation(location) {
-    const turbo_location = Turbolinks.Location.box(location)
-    if (this.cache.get(turbo_location)) {
-      return true
-    } else {
-      return false
-    }
+    return this.cache.has(location)
   }
 
   restoreSnapshotByScrollingToSavedPosition(scrollToSavedPosition) {
