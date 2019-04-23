@@ -46,7 +46,7 @@ Turbolinks.View = class View{
     element = document.createElement("html")
     element.innerHTML = html
     return {
-      title: element.querySelector("title"),
+      title: element.querySelector("title").textContent,
       body: element.querySelector("body")
     }
   }

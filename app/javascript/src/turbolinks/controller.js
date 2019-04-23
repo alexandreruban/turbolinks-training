@@ -81,9 +81,21 @@ Turbolinks.Controller = class Controller {
     const location = this.getVisitableLocationForEvent(event)
 
     if (!event.defaultPrevented && location) {
-      event.preventDefault()
-      this.visit(location)
+      if (this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })) {
+        event.preventDefault()
+        this.visit(location)
+      }
     }
+  }
+
+  // Events
+
+  triggerEvent(eventName, { cancelable, data } = {}) {
+    const event = document.createEvent("events")
+    event.initEvent(eventName, true, cancelable === true) // Second argument is bubbles?
+    event.data = data
+    document.dispatchEvent(event)
+    return !event.defaultPrevented
   }
 
   // Private
