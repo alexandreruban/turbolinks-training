@@ -4,7 +4,7 @@ Turbolinks.Controller = class Controller {
     this.view = new Turbolinks.View(this)
     this.cache = new Turbolinks.Cache(10)
     this.location = Turbolinks.Location.box(window.location)
-    this.locationLoaded = true
+    this.responseLoaded = true
   }
 
   start() {
@@ -42,7 +42,7 @@ Turbolinks.Controller = class Controller {
 
   loadResponse(response) {
     this.view.loadHTML(response)
-    this.locationLoaded = true
+    this.responseLoaded = true
     this.notifyApplicationOfPageChange()
   }
 
@@ -85,7 +85,7 @@ Turbolinks.Controller = class Controller {
   // Page snapshots
 
   saveSnapshot() {
-    if (this.locationLoaded) {
+    if (this.responseLoaded) {
       const snapshot = this.view.saveSnapshot()
       this.cache.put(this.location, snapshot)
     }
@@ -109,7 +109,7 @@ Turbolinks.Controller = class Controller {
 
   locationChangedByActor(location, actor) {
     this.saveSnapshot()
-    this.locationLoaded = false
+    this.responseLoaded = false
     this.location = location
     this.adapter.locationChangedByActor(location, actor)
   }
