@@ -12,9 +12,13 @@ Turbolinks.Location = class Location {
     linkWithAnchor.href = url.toString()
     this.absoluteURL = linkWithAnchor.href
 
-    const linkWithoutAnchor = linkWithAnchor.cloneNode()
-    linkWithoutAnchor.hash = ""
-    this.requestURL = linkWithoutAnchor.href
+    if (linkWithAnchor.hash.length < 2) {
+      this.requestURL = this.absoluteURL
+    } else {
+      const linkWithoutAnchor = linkWithAnchor.cloneNode()
+      linkWithoutAnchor.hash = ""
+      this.requestURL = linkWithoutAnchor.href
+    }
   }
 
   getOrigin() {
