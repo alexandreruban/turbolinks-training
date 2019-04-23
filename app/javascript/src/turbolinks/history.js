@@ -19,26 +19,29 @@ Turbolinks.History = class History {
   }
 
   push(location) {
+    const turbo_location = Turbolinks.Location.box(location)
+
     if (!this.initialized) {
       this.update("replace", null)
       this.initialized = true
     }
 
-    this.update("push", location)
-    this.delegate.locationChangedByActor(location, "application")
+    this.update("push", turbo_location)
+    this.delegate.locationChangedByActor(turbo_location, "application")
   }
 
   replace(location) {
-    this.update("replace", location)
-    this.delegate.locationChangedByActor(location, "application")
+    const turbo_location = Turbolinks.Location.box(location)
+    this.update("replace", turbo_location)
+    this.delegate.locationChangedByActor(turbo_location, "application")
   }
 
   // Event handlers
 
   onPopState = () => {
     if (event.state && event.state.turbolinks) {
-      const location = window.location.toString()
-      this.delegate.locationChangedByActor(location, "history")
+      const turbo_location = Turbolinks.Location.box(location)
+      this.delegate.locationChangedByActor(turbo_location, "history")
     }
   }
 

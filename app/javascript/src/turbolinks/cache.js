@@ -4,10 +4,12 @@ Turbolinks.Cache = class Cache {
   }
 
   put(location, snapshot) {
-    return this.entries[location] = snapshot
+    const turbo_location = Turbolinks.Location.box(location)
+    return this.entries[turbo_location.toCacheKey()] = snapshot
   }
 
   get(location) {
-    return this.entries[location]
+    const turbo_location = Turbolinks.Location.box(location)
+    return this.entries[turbo_location.toCacheKey()]
   }
 }

@@ -3,7 +3,7 @@ Turbolinks.Controller = class Controller {
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
     this.cache = new Turbolinks.Cache(this)
-    this.location = window.location.toString()
+    this.location = Turbolinks.Location.box(window.location)
   }
 
   start() {
@@ -25,15 +25,18 @@ Turbolinks.Controller = class Controller {
   }
 
   visit(location) {
-    this.adapter.visitLocation(location)
+    const turbo_location = Turbolinks.Location.box(location)
+    this.adapter.visitLocation(turbo_location)
   }
 
   pushHistory(location) {
-    this.history.push(location)
+    const turbo_location = Turbolinks.Location.box(location)
+    this.history.push(turbo_location)
   }
 
   replaceHistory(location) {
-    this.thistory.replace(location)
+    const turbo_location = Turbolinks.Location.box(location)
+    this.thistory.replace(turbo_location)
   }
 
   loadResponse(response) {
@@ -49,7 +52,8 @@ Turbolinks.Controller = class Controller {
   }
 
   hasSnapshotForLocation(location) {
-    if (this.cache.get(location)) {
+    const turbo_location = Turbolinks.Location.box(location)
+    if (this.cache.get(turbo_location)) {
       return true
     } else {
       return false
@@ -89,7 +93,7 @@ Turbolinks.Controller = class Controller {
     const location = this.getVisitableLocationForEvent(event)
 
     if (!event.defaultPrevented && location) {
-      if (this.applicationAllowsChangingToLocation()) {
+      if (this.applicationAllowsChangingToLocation(location)) {
         event.preventDefault()
         this.visit(location)
       }
@@ -99,7 +103,7 @@ Turbolinks.Controller = class Controller {
   // Events
 
   applicationAllowsChangingToLocation(location) {
-    this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })
+    return this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })
   }
 
   notifyApplicationOfSnapshotRestoration() {
@@ -118,20 +122,15 @@ Turbolinks.Controller = class Controller {
     event.initEvent(eventName, true, cancelable === true) // Second argument is bubbles?
     event.data = data
     document.dispatchEvent(event)
-    console.log(`dispatched ${eventName} =>`, !event.defaultPrevented)
     return !event.defaultPrevented
   }
 
   getVisitableLocationForEvent(event) {
     const link = Turbolinks.closest(event.target, "a")
-
-    if (link && link.href && this.isSameOrigin(link.href)) {
-      return link.href
+    const turbo_location = new Turbolinks.Location(link.href)
+    if (turbo_location.isSameOrigin()) {
+      return turbo_location
     }
-  }
-
-  isSameOrigin(url) {
-    return url
   }
 }
 
