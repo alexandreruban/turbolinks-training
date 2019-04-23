@@ -104,7 +104,7 @@ Turbolinks.Controller = class Controller {
 
   applicationAllowsChangingToLocation(location) {
     return this.triggerEvent(
-      "page:before-change", { data: { url: location.toString() }, cancelable: true }
+      "page:before-change", { data: { url: location.absoluteURL }, cancelable: true }
     )
   }
 
