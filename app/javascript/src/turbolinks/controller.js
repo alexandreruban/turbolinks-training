@@ -44,6 +44,41 @@ Turbolinks.Controller = class Controller {
     this.notifyApplicationOfPageChange()
   }
 
+  // Current request
+
+  issueRequestForLocation(location) {
+    if (this.xhr) { this.xhr.abort() }
+    this.xhr = new XMLHttpRequest
+    this.xhr.open("GET", location.requestURL, true)
+    this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
+    this.xhr.onloadend = this.requestLoaded
+    this.xhr.onerror = this.requestFailed
+    this.xhr.onabort = this.requestAborted
+    this.xhr.send()
+  }
+
+  abortCurrentRequest() {
+    if (this.xhr) { this.xhr.abort }
+  }
+
+  requestLoaded = () => {
+    if (this.xhr.status >= 200 && this.xhr.status < 300) {
+      this.adapter.requestCompletedWithResponse(this.xhr.responseText)
+    } else {
+      this.adapter.requestFailedWithStatusCode(this.xhr.status, this.xhr.responseText)
+    }
+    this.xhr = null
+  }
+
+  requestFailed = () => {
+    this.adapter.requestFailedWithStatusCode(null)
+    this.xhr = null
+  }
+
+  requestAborted = () => {
+    this.xhr = null
+  }
+
   // Page snapshots
 
   saveSnapshot() {

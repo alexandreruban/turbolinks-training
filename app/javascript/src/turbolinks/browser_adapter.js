@@ -9,31 +9,14 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
 
   locationChangedByActor(location, actor) {
     this.controller.restoreSnapshotByScrollingToSavedPosition(actor === "history")
-    this.issueRequestForLocation(location)
+    this.controller.issueRequestForLocation(location)
   }
 
-  snapshotRestored() {
-
+  requestCompletedWithResponse(response) {
+    this.controller.loadResponse(response)
   }
 
-  // Private
-
-  issueRequestForLocation(location) {
-    if (this.xhr) { this.xhr.abort() }
-    this.xhr = new XMLHttpRequest
-    this.xhr.open("GET", location.requestURL, true)
-    this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
-    this.xhr.onload = this.requestLoaded
-    this.xhr.onerror = this.requestFailed
-    this.xhr.send()
-  }
-
-  requestLoaded = () => {
-    this.controller.loadResponse(this.xhr.responseText)
-    this.xhr = null
-  }
-
-  requestFailed = () => {
-    this.xhr = null
+  requestFailedWithStatusCode(statusCode, response) {
+    console.error("FAILED REQUEST:", statusCode)
   }
 }
