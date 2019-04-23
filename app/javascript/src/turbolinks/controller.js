@@ -48,8 +48,9 @@ Turbolinks.Controller = class Controller {
 
   issueRequestForLocation(location) {
     if (this.xhr) { this.xhr.abort() }
+    const turbo_location = Turbolinks.Location.box(location)
     this.xhr = new XMLHttpRequest
-    this.xhr.open("GET", location.requestURL, true)
+    this.xhr.open("GET", turbo_location.requestURL, true)
     this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
     this.xhr.onloadend = this.requestLoaded
     this.xhr.onerror = this.requestFailed
