@@ -9,6 +9,7 @@ Turbolinks.Controller = class Controller {
   start() {
     if (!this.started) {
       addEventListener("click", this.clickCaptured, true)
+      addEventListener("DOMContentLoaded", this.pageLoaded, false)
       this.history.start()
       this.started = true
     }
@@ -17,6 +18,7 @@ Turbolinks.Controller = class Controller {
   stop() {
     if (this.started) {
       removeEventListener("click", this.clickCaptured, true)
+      removeEventListener("DOMContentLoaded", this.pageLoaded, false)
       this.history.stop()
       this.started = false
     }
@@ -36,6 +38,7 @@ Turbolinks.Controller = class Controller {
 
   loadResponse(response) {
     this.view.loadHTML(response)
+    this.notifyApplicationOfPageChange()
   }
 
   // Page snapshots
@@ -58,6 +61,7 @@ Turbolinks.Controller = class Controller {
 
     if (snapshot) {
       this.view.loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition)
+      this.notifyApplicationOfSnapshotRestoration()
       return true
     }
   }
@@ -72,6 +76,10 @@ Turbolinks.Controller = class Controller {
 
   // Event handlers
 
+  pageLoaded = () => {
+    this.notifyApplicationOfPageChange()
+  }
+
   clickCaptured = () => {
     removeEventListener("click", this.clickBubbled, false)
     addEventListener("click", this.clickBubbled, false)
@@ -81,7 +89,7 @@ Turbolinks.Controller = class Controller {
     const location = this.getVisitableLocationForEvent(event)
 
     if (!event.defaultPrevented && location) {
-      if (this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })) {
+      if (this.applicationAllowsChangingToLocation()) {
         event.preventDefault()
         this.visit(location)
       }
@@ -90,15 +98,29 @@ Turbolinks.Controller = class Controller {
 
   // Events
 
-  triggerEvent(eventName, { cancelable, data } = {}) {
-    const event = document.createEvent("events")
-    event.initEvent(eventName, true, cancelable === true) // Second argument is bubbles?
-    event.data = data
-    document.dispatchEvent(event)
-    return !event.defaultPrevented
+  applicationAllowsChangingToLocation(location) {
+    this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })
+  }
+
+  notifyApplicationOfSnapshotRestoration() {
+    this.triggerEvent("page:restore")
+  }
+
+  notifyApplicationOfPageChange() {
+    this.triggerEvent("page:change")
+    this.triggerEvent("page:update")
   }
 
   // Private
+
+  triggerEvent(eventName, { cancelable, data } = {}) {
+    const event = document.createEvent("Events")
+    event.initEvent(eventName, true, cancelable === true) // Second argument is bubbles?
+    event.data = data
+    document.dispatchEvent(event)
+    console.log(`dispatched ${eventName} =>`, !event.defaultPrevented)
+    return !event.defaultPrevented
+  }
 
   getVisitableLocationForEvent(event) {
     const link = Turbolinks.closest(event.target, "a")
