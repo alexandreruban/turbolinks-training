@@ -8,16 +8,16 @@ Turbolinks.Controller = class Controller {
 
   start() {
     if (!this.started) {
-      addEventListener("popstate", this.historyPopped, false)
       addEventListener("click", this.clickCaptured, true)
+      this.history.start()
       this.started = true
     }
   }
 
   stop() {
     if (this.started) {
-      removeEventListener("popstate", this.historyPopped, false)
       removeEventListener("click", this.clickCaptured, true)
+      this.history.stop()
       this.started = false
     }
   }
@@ -64,17 +64,13 @@ Turbolinks.Controller = class Controller {
 
   // History delegate
 
-  historyChanged(location) {
-    this.locationChangedByActor(location, "application")
+  locationChangedByActor(location, actor) {
+    this.saveSnapshot()
+    this.location = location
+    this.adapter.locationChangedByActor(location, actor)
   }
 
   // Event handlers
-
-  historyPopped = (event) => {
-    if (event.state && event.state.turbolinks) {
-      this.locationChangedByActor(window.location.toString(), "history")
-    }
-  }
 
   clickCaptured = () => {
     removeEventListener("click", this.clickBubbled, false)
@@ -91,12 +87,6 @@ Turbolinks.Controller = class Controller {
   }
 
   // Private
-
-  locationChangedByActor(location, actor) {
-    this.saveSnapshot()
-    this.location = location
-    this.adapter.locationChangedByActor(location, actor)
-  }
 
   getVisitableLocationForEvent(event) {
     const link = Turbolinks.closest(event.target, "a")
