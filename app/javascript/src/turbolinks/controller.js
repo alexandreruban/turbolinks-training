@@ -103,7 +103,9 @@ Turbolinks.Controller = class Controller {
   // Events
 
   applicationAllowsChangingToLocation(location) {
-    return this.triggerEvent("page:before-change", { data: { url: location }, cancelable: true })
+    return this.triggerEvent(
+      "page:before-change", { data: { url: location.toString() }, cancelable: true }
+    )
   }
 
   notifyApplicationOfSnapshotRestoration() {
@@ -126,10 +128,14 @@ Turbolinks.Controller = class Controller {
   }
 
   getVisitableLocationForEvent(event) {
-    const link = Turbolinks.closest(event.target, "a")
-    const turbo_location = new Turbolinks.Location(link.href)
-    if (turbo_location.isSameOrigin()) {
-      return turbo_location
+    const link = Turbolinks.closest(event.target, "a[href]")
+
+    if (link) {
+      const turbo_location = new Turbolinks.Location(link.href)
+
+      if (turbo_location.isSameOrigin()) {
+        return turbo_location
+      }
     }
   }
 }
