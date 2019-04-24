@@ -38,7 +38,7 @@ Turbolinks.View = class View{
     })
 
     const newBody = newSnapshot.body.cloneNode(true)
-    this.importPermanentBodyElements(newBody, currentSnapshot.getPermanentBodyElements())
+    this.importPermanentElementsIntoBody(newBody)
     document.body = newBody
   }
 
@@ -68,13 +68,17 @@ Turbolinks.View = class View{
     })
   }
 
-  importPermanentBodyElements = (body, permanentBodyElements) => {
-    permanentBodyElements.forEach((newChild) => {
-      const oldChild = body.querySelector(`[id=${newChild.id}]`)
+  importPermanentElementsIntoBody = (newBody) => {
+    this.getPermanentElements(document.body).forEach((newChild) => {
+      const oldChild = newBody.querySelector(`[id=${newChild.id}]`)
       if (oldChild) {
         oldChild.parentNode.replaceChild(newChild, oldChild)
       }
     })
+  }
+
+  getPermanentElements = (element) => {
+    return element.querySelectorAll("[id][data-turbolinks-permanent]")
   }
 
   maybeCloneElement = (element, clone) => {

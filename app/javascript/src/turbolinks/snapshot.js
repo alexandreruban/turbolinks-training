@@ -29,10 +29,6 @@ Turbolinks.Snapshot = class Snapshot {
     return this.getTemporaryHeadElementSet().getElements()
   }
 
-  getPermanentBodyElements() {
-    return this.body.querySelectorAll("[id][data-turbolinks-permanent]")
-  }
-
   // Private
 
   getTrackedHeadElementSet() {
