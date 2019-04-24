@@ -45,8 +45,8 @@ Turbolinks.ElementSet = class ElementSet {
 
   getElementsNotPresentInSet(elementSet) {
     const index = elementSet.getElementIndex()
-    const elements = this.elements.filter((element) => {
-      !index.includes(element.value)
+    const elements = this.elements.filter(({ element, value }) => {
+      return !Object.keys(index).includes(value)
     }).map(({ element, value }) => element)
 
     return new this.constructor(elements)
@@ -78,5 +78,6 @@ Turbolinks.ElementSet = class ElementSet {
       elementIndex[value] = element
     })
     this.elementIndex = elementIndex
+    return elementIndex
   }
 }

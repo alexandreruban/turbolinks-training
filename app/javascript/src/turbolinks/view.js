@@ -21,7 +21,7 @@ Turbolinks.View = class View{
 
   loadSnapshot(newSnapshot) {
     const currentSnapshot = this.getSnapshot(false)
-    if (!currentSnapshot.hasSameRemoteHeadElementsAsSnapshot(newSnapshot)) {
+    if (!currentSnapshot.hasSameTrackedHeadElementsAsSnapshot(newSnapshot)) {
       return window.location.reload()
     }
 

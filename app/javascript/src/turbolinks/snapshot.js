@@ -15,9 +15,8 @@ Turbolinks.Snapshot = class Snapshot {
     this.scrollTop = scrollTop || 0
   }
 
-  hasSameRemoteHeadElementsAsSnapshot(snapshot) {
-    return this.getRemoteHeadStyleElementSet().isEqualTo(snapshot.getRemoteHeadStyleElementSet()) &&
-             this.getRemoteHeadScriptElementSet().isEqualTo(snapshot.getRemoteHeadScriptElementSet())
+  hasSameTrackedHeadElementsAsSnapshot(snapshot) {
+    return this.getTrackedHeadElementSet().isEqualTo(snapshot.getTrackedHeadElementSet())
   }
 
   getInlineHeadElementsNotPresentInSnapshot(snapshot) {
@@ -36,19 +35,19 @@ Turbolinks.Snapshot = class Snapshot {
 
   // Private
 
+  getTrackedHeadElementSet() {
+    const trackedHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector("[data-turbolinks-track=reload]")
+    if (trackedHeadElementSet) {
+      this.trackedHeadElementSet = trackedHeadElementSet
+      return trackedHeadElementSet
+    }
+  }
+
   getInlineHeadStyleElementSet() {
     const inlineHeadStyleElementSet = this.getPermanentHeadElementSet().selectElementsMatchingSelector("style")
     if (inlineHeadStyleElementSet) {
       this.inlineHeadStyleElementSet = inlineHeadStyleElementSet
       return inlineHeadStyleElementSet
-    }
-  }
-
-  getRemoteHeadStyleElementSet() {
-    const remoteHeadStyleElementSet = this.getPermanentHeadElementSet().selectElementsMatchingSelector("link[rel=stylesheet]")
-    if (remoteHeadStyleElementSet) {
-      this.remoteHeadStyleElementSet = remoteHeadStyleElementSet
-      return remoteHeadStyleElementSet
     }
   }
 
@@ -60,16 +59,8 @@ Turbolinks.Snapshot = class Snapshot {
     }
   }
 
-  getRemoteHeadScriptElementSet() {
-    const remoteHeadScriptElementSet = this.getPermanentHeadElementSet().selectElementsMatchingSelector("script[src]")
-    if (remoteHeadScriptElementSet) {
-      this.remoteHeadScriptElementSet = remoteHeadScriptElementSet
-      return remoteHeadScriptElementSet
-    }
-  }
-
   getPermanentHeadElementSet() {
-    const permanentHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector("style, link[rel=stylesheet], script")
+    const permanentHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector("style, link[rel=stylesheet], script, [data-turbolinks-track=reload]")
     if (permanentHeadElementSet) {
       this.permanentHeadElementSet = permanentHeadElementSet
       return permanentHeadElementSet
@@ -77,7 +68,7 @@ Turbolinks.Snapshot = class Snapshot {
   }
 
   getTemporaryHeadElementSet() {
-    const temporaryHeadElementSet = this.getHeadElementSet().rejectElementsMatchingSelector("style, link[rel=stylesheet], script")
+    const temporaryHeadElementSet = this.getHeadElementSet().getElementsNotPresentInSet(this.getPermanentHeadElementSet())
     if (temporaryHeadElementSet) {
       this.temporaryHeadElementSet = temporaryHeadElementSet
       return temporaryHeadElementSet
