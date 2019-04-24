@@ -126,9 +126,9 @@ Turbolinks.Controller = class Controller {
   }
 
   clickBubbled = (event) => {
-    const location = this.getVisitableLocationForEvent(event)
+    const location = this.getVisitableLocationForNode(event.target)
 
-    if (!event.defaultPrevented && location) {
+    if (this.clickEventIsSignificant(event) && location) {
       if (this.applicationAllowsChangingToLocation(location)) {
         event.preventDefault()
         this.visit(location)
@@ -163,8 +163,19 @@ Turbolinks.Controller = class Controller {
     return !event.defaultPrevented
   }
 
-  getVisitableLocationForEvent(event) {
-    const link = Turbolinks.closest(event.target, "a[href]")
+  clickEventIsSignificant(event) {
+    return !(
+      event.defaultPrevented ||
+      event.which > 1 ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.shiftKey
+    )
+  }
+
+  getVisitableLocationForNode(node) {
+    const link = Turbolinks.closest(node, "a[href]")
 
     if (link) {
       const turbo_location = new Turbolinks.Location(link.href)
