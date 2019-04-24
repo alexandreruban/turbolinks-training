@@ -7,36 +7,12 @@ Turbolinks.ElementSet = class ElementSet {
     })
   }
 
-  hasElement(element) {
-    if (this.findElement(element)) {
-      return true
-    } else {
-      return false
-    }
-  }
-
-  findElement(needleElement) {
-    this.getElementIndex()[needleElement.outerHTML]
-  }
-
   selectElementsMatchingSelector(selector) {
     const elements = this.elements.filter((element) => {
       if (Turbolinks.match(element.element, selector)) {
         return true
       } else {
         return false
-      }
-    }).map(({ element, value }) => element)
-
-    return new this.constructor(elements)
-  }
-
-  rejectElementsMatchingSelector(selector) {
-    const elements = this.elements.filter((element) => {
-      if (Turbolinks.match(element.element, selector)) {
-        return false
-      } else {
-        return true
       }
     }).map(({ element, value }) => element)
 
