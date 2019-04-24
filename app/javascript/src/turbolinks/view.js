@@ -4,50 +4,84 @@ Turbolinks.View = class View{
   }
 
   loadHTML(html) {
-    this.loadSnapshotByScrollingToSavedPosition(this.parseHTML(html), "anchor")
+    const snapshot = Turbolinks.Snapshot.fromHTML(html)
+    this.loadSnapshotByScrollingToSavedPosition(snapshot, "anchor")
   }
 
   loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition) {
-    document.title = snapshot.title
-    document.body  = snapshot.body
-    this.scrollToSavedPositionWithOffsets(scrollToSavedPosition, snapshot.offsets)
+    this.loadSnapshot(snapshot)
+    this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
   }
 
   saveSnapshot() {
-    return {
-      body: document.body.cloneNode(true),
-      title: document.title,
-      offsets: {
-        left: window.pageXOffset,
-        top: window.pageYOffset
-      }
-    }
+    return this.getSnapshot(true)
   }
 
   // Private
 
-  scrollToSavedPositionWithOffsets(scrollToSavedPosition, snapshotOffsets) {
+  loadSnapshot(newSnapshot) {
+    const currentSnapshot = this.getSnapshot(false)
+    if (!currentSnapshot.hasSameRemoteHeadElementsAsSnapshot(newSnapshot)) {
+      return window.location.reload()
+    }
+
+    newSnapshot.getInlineHeadElementsNotPresentInSnapshot(currentSnapshot).forEach((element) => {
+      document.head.appendChild(element.cloneNode(true))
+    })
+
+    currentSnapshot.getTemporaryHeadElements().forEach((element) => {
+      document.head.removeChild(element)
+    })
+
+    newSnapshot.getTemporaryHeadElements().forEach((element) => {
+      document.head.appendChild(element.cloneNode(true))
+    })
+
+    const newBody = newSnapshot.body.cloneNode(true)
+    this.importPermanentBodyElements(newBody, currentSnapshot.getPermanentBodyElements())
+    document.body = newBody
+  }
+
+  scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition) {
     const location = window.location.toString()
 
-    if (scrollToSavedPosition && snapshotOffsets) {
-      const xOffset = snapshotOffsets.left || 0
-      const yOffset = snapshotOffsets.top  || 0
-      scrollTo(xOffset, yOffset)
-    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
-      document.querySelector(window.location.hash).scrollIntoView()
-    } else {
-      scrollTo(0, 0)
-    }
+    scrollTo(0, 0)
+    // if (scrollToSavedPosition && snapshotOffsets) {
+    //   const xOffset = snapshotOffsets.left || 0
+    //   const yOffset = snapshotOffsets.top  || 0
+    //   scrollTo(xOffset, yOffset)
+    // } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
+    //   document.querySelector(window.location.hash).scrollIntoView()
+    // } else {
+    //   scrollTo(0, 0)
+    // }
 
     this.lastScrolledLocation = location
   }
 
-  parseHTML(html) {
-    element = document.createElement("html")
-    element.innerHTML = html
-    return {
-      title: element.querySelector("title").textContent,
-      body: element.querySelector("body")
+  getSnapshot = (clone) => {
+    return new Turbolinks.Snapshot({
+      head: this.maybeCloneElement(document.head, clone),
+      body: this.maybeCloneElement(document.body, clone),
+      scrollLeft: window.pageXOffset,
+      scrollTop: window.pageYOffset,
+    })
+  }
+
+  importPermanentBodyElements = (body, permanentBodyElements) => {
+    permanentBodyElements.forEach((newChild) => {
+      const oldChild = body.querySelector(`[id=${newChild.id}]`)
+      if (oldChild) {
+        oldChild.parentNode.replaceChild(newChild, oldChild)
+      }
+    })
+  }
+
+  maybeCloneElement = (element, clone) => {
+    if (clone) {
+      return element.cloneNode(true)
+    } else {
+      return element
     }
   }
 }

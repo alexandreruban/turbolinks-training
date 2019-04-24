@@ -1,5 +1,7 @@
 import "../src/turbolinks";
 import "../src/turbolinks/helpers";
+import "../src/turbolinks/element_set";
+import "../src/turbolinks/snapshot";
 import "../src/turbolinks/location";
 import "../src/turbolinks/cache";
 import "../src/turbolinks/view";
