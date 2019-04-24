@@ -59,5 +59,9 @@
   <p>Find me in app/views/pages/home.html.erb</p>
   <p>Find me in app/views/pages/home.html.erb</p>
   <p>Find me in app/views/pages/home.html.erb</p>
-  <%= link_to "About", about_path, id: "bottom_link" %>
+  <%= link_to "About",
+              about_path,
+              id: "bottom_link",
+              data: { turbolinks: false } %>
+  </div>
 </div>

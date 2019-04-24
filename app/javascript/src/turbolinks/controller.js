@@ -177,12 +177,21 @@ Turbolinks.Controller = class Controller {
   getVisitableLocationForNode(node) {
     const link = Turbolinks.closest(node, "a[href]")
 
-    if (link) {
+    if (this.nodeIsVisitable(node) && link) {
       const turbo_location = new Turbolinks.Location(link.href)
 
       if (turbo_location.isSameOrigin()) {
         return turbo_location
       }
+    }
+  }
+
+  nodeIsVisitable(node) {
+    const container = Turbolinks.closest(node, "[data-turbolinks]")
+    if (container) {
+      return container.getAttribute("data-turbolinks") != "false"
+    } else {
+      return true
     }
   }
 }
