@@ -1,5 +1,6 @@
 import "../src/turbolinks";
 import "../src/turbolinks/helpers";
+import "../src/turbolinks/element_pool";
 import "../src/turbolinks/element_set";
 import "../src/turbolinks/snapshot";
 import "../src/turbolinks/location";

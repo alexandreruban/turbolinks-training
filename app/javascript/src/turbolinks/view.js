@@ -39,6 +39,7 @@ Turbolinks.View = class View{
 
     const newBody = newSnapshot.body.cloneNode(true)
     this.importPermanentElementsIntoBody(newBody)
+    this.importRecyclableElementsIntoBody(newBody)
     document.body = newBody
   }
 
@@ -77,8 +78,22 @@ Turbolinks.View = class View{
     })
   }
 
+  importRecyclableElementsIntoBody = (newBody) => {
+    const elementPool = new Turbolinks.ElementPool(this.getRecyclableElements(document.body))
+    this.getRecyclableElements(newBody).forEach((oldChild) => {
+      const newChild = elementPool.retrieveMatchingElement(oldChild)
+      if (newChild) {
+        oldChild.parentNode.replaceChild(newChild, oldChild)
+      }
+    })
+  }
+
   getPermanentElements = (element) => {
     return element.querySelectorAll("[id][data-turbolinks-permanent]")
+  }
+
+  getRecyclableElements = (element) => {
+    return element.querySelectorAll("[data-turbolinks-recyclable]")
   }
 
   maybeCloneElement = (element, clone) => {
