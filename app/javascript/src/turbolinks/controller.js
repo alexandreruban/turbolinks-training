@@ -105,6 +105,12 @@ Turbolinks.Controller = class Controller {
     }
   }
 
+  // View delegate
+
+  viewInvalidated() {
+    this.adapter.pageInvalidated()
+  }
+
   // History delegate
 
   locationChangedByActor(location, actor) {

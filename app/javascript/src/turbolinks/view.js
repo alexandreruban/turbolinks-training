@@ -5,12 +5,13 @@ Turbolinks.View = class View{
 
   loadHTML(html) {
     const snapshot = Turbolinks.Snapshot.fromHTML(html)
-    this.loadSnapshotByScrollingToSavedPosition(snapshot, "anchor")
+    this.loadSnapshotByScrollingToSavedPosition(snapshot, "anchor", true)
   }
 
-  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition) {
-    this.loadSnapshot(snapshot)
-    this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
+  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition, fromHTML) {
+    if (this.loadSnapshot(snapshot)) {
+      this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
+    }
   }
 
   saveSnapshot() {
@@ -22,7 +23,8 @@ Turbolinks.View = class View{
   loadSnapshot(newSnapshot) {
     const currentSnapshot = this.getSnapshot(false)
     if (!currentSnapshot.hasSameTrackedHeadElementsAsSnapshot(newSnapshot)) {
-      return window.location.reload()
+      this.delegate.viewInvalidated()
+      return false
     }
 
     newSnapshot.getInlineHeadElementsNotPresentInSnapshot(currentSnapshot).forEach((element) => {
@@ -41,6 +43,7 @@ Turbolinks.View = class View{
     this.importPermanentElementsIntoBody(newBody)
     this.importRecyclableElementsIntoBody(newBody)
     document.body = newBody
+    return newSnapshot
   }
 
   scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition) {
