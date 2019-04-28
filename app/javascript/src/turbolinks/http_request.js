@@ -1,14 +1,8 @@
 Turbolinks.HttpRequest = class HttpRequest {
   constructor(delegate, location) {
     this.delegate = delegate
-    this.location = Turbolinks.Location.box(location)
-    this.xhr = new XMLHttpRequest
-    this.xhr.open("GET", this.location.requestURL, true)
-    this.xhr.setRequestHeader("Accept", "text/html, application/xhtml+xml, application/xml")
-    this.xhr.onprogress = this.requestProgressed
-    this.xhr.onloadend = this.requestLoaded
-    this.xhr.onerror = this.requestFailed
-    this.xhr.onabort = this.requestAborted
+    this.url = Turbolinks.Location.box(location).requestURL
+    this.createXHR()
   }
 
   send() {
@@ -35,24 +29,56 @@ Turbolinks.HttpRequest = class HttpRequest {
   }
 
   requestLoaded = () => {
-    if (200 <= this.xhr.status && this.xhr.status < 300) {
-      this.delegate.requestCompletedWithResponse(this.xhr.responseText)
-    } else {
-      this.delegate.requestFailedWithStatusCode(this.xhr.status, this.xhr.responseText)
+    this.endRequest(() => {
+      if (200 <= this.xhr.status && this.xhr.status < 300) {
+        this.delegate.requestCompletedWithResponse(this.xhr.responseText)
+      } else {
+        this.delegate.requestFailedWithStatusCode(this.xhr.status, this.xhr.responseText)
+      }
+    })
+  }
+
+  requestFailed = () => {
+    this.endRequest(() => {
+      this.delegate.requestFailedWithStatusCode(null)
+    })
+  }
+
+  requestAborted = () => {
+    this.endRequest()
+  }
+
+  // Private
+
+  createXHR() {
+    this.xhr = new XMLHttpRequest
+    this.xhr.open("GET", this.url, true)
+    this.xhr.setRequestHeader("Accept", "text/html, application/xhtml+xml, application/xml")
+    this.xhr.onprogress = this.requestProgressed
+    this.xhr.onloadend = this.requestLoaded
+    this.xhr.onerror = this.requestFailed
+    this.xhr.onabort = this.requestAborted
+  }
+
+  endRequest(callback) {
+    this.notifyApplicationAfterRequestEnd()
+    if(typeof callback === "function") {
+      callback.call(this)
     }
     this.destroy()
   }
 
-  requestFailed = () => {
-    this.delegate.requestFailedWithStatusCode(null)
-    this.destroy()
+  notifyApplicationBeforeRequestStart() {
+    Turbolinks.dispatch("turbolinks:request-start", {
+      data: { url: this.url, xhr: this.xhr }
+    })
   }
 
-  requestAborted = () => {
-    this.destroy()
+  notifyApplicationAfterRequestEnd() {
+    Turbolinks.dispatch("turbolinks:request-end", {
+      data: { url: this.url, xhr: this.xhr }
+    })
   }
-
-  // Private
 
   setProgress(progress) {
     this.progress = progress
