@@ -12,6 +12,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
     this.controller.issueRequestForLocation(location)
   }
 
+  requestProgressed(progress) {
+    console.log("request progressed", progress)
+  }
+
   requestCompletedWithResponse(response) {
     this.controller.loadResponse(response)
   }

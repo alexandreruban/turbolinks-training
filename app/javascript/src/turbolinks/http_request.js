@@ -5,6 +5,7 @@ Turbolinks.HttpRequest = class HttpRequest {
     this.xhr = new XMLHttpRequest
     this.xhr.open("GET", this.location.requestURL, true)
     this.xhr.setRequestHeader("Accept", "text/html, application/xhtml+xml, application/xml")
+    this.xhr.onprogress = this.requestProgressed
     this.xhr.onloadend = this.requestLoaded
     this.xhr.onerror = this.requestFailed
     this.xhr.onabort = this.requestAborted
@@ -12,6 +13,7 @@ Turbolinks.HttpRequest = class HttpRequest {
 
   send() {
     if (this.xhr && !this.sent) {
+      this.setProgress(0)
       this.xhr.send()
       return this.sent = true
     }
@@ -24,6 +26,14 @@ Turbolinks.HttpRequest = class HttpRequest {
   }
 
   // XMLHttpRequest events
+
+  requestProgressed = (event) => {
+    if (event.lengthComputable) {
+      this.setProgress(event.loaded / event.total)
+    } else {
+      this.incrementProgressIndeterminately()
+    }
+  }
 
   requestLoaded = () => {
     if (200 <= this.xhr.status && this.xhr.status < 300) {
@@ -45,7 +55,17 @@ Turbolinks.HttpRequest = class HttpRequest {
 
   // Private
 
+  setProgress(progress) {
+    this.progress = progress
+    this.delegate.requestProgressed(this.progress)
+  }
+
+  incrementProgressIndeterminately() {
+    this.setProgress(this.progress + (1 - this.progress) * 0.1)
+  }
+
   destroy() {
+    this.setProgress(1)
     this.delegate = null
     this.xhr = null
   }
