@@ -7,6 +7,7 @@ Turbolinks.HttpRequest = class HttpRequest {
 
   send() {
     if (this.xhr && !this.sent) {
+      this.notifyApplicationBeforeRequestStart()
       this.setProgress(0)
       this.xhr.send()
       this.sent = true
@@ -48,6 +49,20 @@ Turbolinks.HttpRequest = class HttpRequest {
     this.endRequest()
   }
 
+  // Application events
+
+  notifyApplicationBeforeRequestStart() {
+    Turbolinks.dispatch("turbolinks:request-start", {
+      data: { url: this.url, xhr: this.xhr }
+    })
+  }
+
+  notifyApplicationAfterRequestEnd() {
+    Turbolinks.dispatch("turbolinks:request-end", {
+      data: { url: this.url, xhr: this.xhr }
+    })
+  }
+
   // Private
 
   createXHR() {
@@ -66,18 +81,6 @@ Turbolinks.HttpRequest = class HttpRequest {
       callback.call(this)
     }
     this.destroy()
-  }
-
-  notifyApplicationBeforeRequestStart() {
-    Turbolinks.dispatch("turbolinks:request-start", {
-      data: { url: this.url, xhr: this.xhr }
-    })
-  }
-
-  notifyApplicationAfterRequestEnd() {
-    Turbolinks.dispatch("turbolinks:request-end", {
-      data: { url: this.url, xhr: this.xhr }
-    })
   }
 
   setProgress(progress) {

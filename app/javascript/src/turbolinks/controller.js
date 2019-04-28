@@ -122,7 +122,7 @@ Turbolinks.Controller = class Controller {
     }
   }
 
-  // Events
+  // Application events
 
   applicationAllowsFollowingLinkToLocation(link, location) {
     return this.dispatchEvent(
