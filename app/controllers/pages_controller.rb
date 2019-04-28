@@ -5,4 +5,8 @@ class PagesController < ApplicationController
 
   def about
   end
+
+  def flunk
+    raise
+  end
 end

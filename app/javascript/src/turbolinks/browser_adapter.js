@@ -29,7 +29,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   }
 
   requestFailedWithStatusCode(statusCode, response) {
-    console.error("FAILED REQUEST:", statusCode)
+    this.controller.stop()
+    // TODO: Move this into the view
+    document.documentElement.innerHTML = response
+    this.activeScripts()
   }
 
   requestFinished() {
@@ -56,5 +59,23 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   hideProgressBar() {
     this.progressBar.hide()
     clearTimeout(this.progressBarTimeout)
+  }
+
+  activeScripts = () => {
+    document.querySelectorAll("script").forEach((oldChild) => {
+      const newChild = this.cloneScript(oldChild)
+      oldChild.parentNode.replaceChild(newChild, oldChild)
+    })
+  }
+
+  cloneScript = (script) => {
+    const element = document.createElement("script")
+    if (script.hasAttribute("src")) {
+      element.src = script.getAttribute("src")
+    } else {
+      element.textContent = script.textContent
+    }
+
+    return element
   }
 }

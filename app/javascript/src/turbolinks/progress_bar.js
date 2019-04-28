@@ -64,7 +64,9 @@ Turbolinks.ProgressBar = class ProgressBar {
   }
 
   uninstallProgressElement() {
-    document.documentElement.removeChild(this.progressElement)
+    if (this.progressElement.parentNode) {
+      document.documentElement.removeChild(this.progressElement)
+    }
   }
 
   startTrickling() {
