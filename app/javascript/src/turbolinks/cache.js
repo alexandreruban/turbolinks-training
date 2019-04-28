@@ -7,7 +7,7 @@ Turbolinks.Cache = class Cache {
 
   has(location) {
     const key = this.keyForLocation(location)
-    return Object.keys(this.snapshots).includes(location)
+    return key in this.snapshots
   }
 
   get(location) {

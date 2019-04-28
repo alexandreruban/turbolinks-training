@@ -38,7 +38,7 @@ Turbolinks.History = class History {
 
   // Event handlers
 
-  onPopState = () => {
+  onPopState = (event) => {
     if (event.state && event.state.turbolinks) {
       const turbo_location = Turbolinks.Location.box(location)
       this.delegate.locationChangedByActor(turbo_location, "history")
