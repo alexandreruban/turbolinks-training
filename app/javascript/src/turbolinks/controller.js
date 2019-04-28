@@ -114,10 +114,12 @@ Turbolinks.Controller = class Controller {
   clickBubbled = (event) => {
     if (this.clickEventIsSignificant(event)) {
       const link = this.getVisitableLinkForNode(event.target)
-      const location = this.getVisitableLocationForLink(link)
-      if (location && this.applicationAllowsFollowingLinkToLocation(link, location)) {
-        event.preventDefault()
-        this.visit(location)
+      if (link) {
+        const location = this.getVisitableLocationForLink(link)
+        if (location && this.applicationAllowsFollowingLinkToLocation(link, location)) {
+          event.preventDefault()
+          this.visit(location)
+        }
       }
     }
   }
