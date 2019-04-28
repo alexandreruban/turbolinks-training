@@ -157,7 +157,7 @@ Turbolinks.Controller = class Controller {
   }
 
   getVisitableLocationForNode(node) {
-    const link = Turbolinks.closest(node, "a[href]")
+    const link = Turbolinks.closest(node, "a[href]:not([target])")
 
     if (this.nodeIsVisitable(node) && link) {
       const turbo_location = new Turbolinks.Location(link.href)
