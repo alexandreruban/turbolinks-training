@@ -49,37 +49,13 @@ Turbolinks.Controller = class Controller {
   // Current request
 
   issueRequestForLocation(location) {
-    const turbo_location = Turbolinks.Location.box(location)
     this.abortCurrentRequest()
-    this.xhr = new XMLHttpRequest
-    this.xhr.open("GET", turbo_location.requestURL, true)
-    this.xhr.setRequestHeader("Accept", "text/html, application/xhtml/xml, application/xml")
-    this.xhr.onloadend = this.requestLoaded
-    this.xhr.onerror = this.requestFailed
-    this.xhr.onabort = this.requestAborted
-    this.xhr.send()
+    this.request = new Turbolinks.HttpRequest(this.adapter, this.location)
+    this.request.send()
   }
 
   abortCurrentRequest() {
-    if (this.xhr) { this.xhr.abort }
-  }
-
-  requestLoaded = () => {
-    if (this.xhr.status >= 200 && this.xhr.status < 300) {
-      this.adapter.requestCompletedWithResponse(this.xhr.responseText)
-    } else {
-      this.adapter.requestFailedWithStatusCode(this.xhr.status, this.xhr.responseText)
-    }
-    this.xhr = null
-  }
-
-  requestFailed = () => {
-    this.adapter.requestFailedWithStatusCode(null)
-    this.xhr = null
-  }
-
-  requestAborted = () => {
-    this.xhr = null
+    if (this.request) { this.request.abort() }
   }
 
   // Page snapshots
