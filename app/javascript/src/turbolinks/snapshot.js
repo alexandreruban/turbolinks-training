@@ -36,7 +36,7 @@ Turbolinks.Snapshot = class Snapshot {
   // Private
 
   getTrackedHeadElementSet() {
-    const trackedHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector("[data-turbolinks-track=reload]")
+    const trackedHeadElementSet = this.getPermanentHeadElementSet().selectElementsMatchingSelector("[data-turbolinks-track=reload]")
     if (trackedHeadElementSet) {
       this.trackedHeadElementSet = trackedHeadElementSet
       return trackedHeadElementSet
@@ -60,7 +60,9 @@ Turbolinks.Snapshot = class Snapshot {
   }
 
   getPermanentHeadElementSet() {
-    const permanentHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector("style, link[rel=stylesheet], script, [data-turbolinks-track=reload]")
+    const permanentHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector(
+      "style, link[rel=stylesheet], script, [data-turbolinks-track=reload], [data-turbolinks-permanent]"
+    )
     if (permanentHeadElementSet) {
       this.permanentHeadElementSet = permanentHeadElementSet
       return permanentHeadElementSet
