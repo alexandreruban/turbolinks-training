@@ -30,3 +30,16 @@ const match = () => {
          html.msMatchesSelector ||
          html.mozMatchesSelector
 }
+
+Turbolinks.dispatch = (eventName, { target, cancelable, data } = {}) => {
+  event = document.createEvent("Events")
+  event.initEvent(eventName, true, cancelable === true)
+  event.data = data
+  if (target) {
+    target.dispatchEvent(event)
+  } else {
+    document.dispatchEvent(event)
+  }
+
+  return event
+}

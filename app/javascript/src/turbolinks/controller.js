@@ -27,7 +27,9 @@ Turbolinks.Controller = class Controller {
 
   visit(location) {
     const turbo_location = Turbolinks.Location.box(location)
-    this.adapter.visitLocation(turbo_location)
+    if (this.applicationAllowsVisitingLocation(turbo_location)) {
+      this.adapter.visitLocation(turbo_location)
+    }
   }
 
   pushHistory(location) {
@@ -43,7 +45,8 @@ Turbolinks.Controller = class Controller {
   loadResponse(response) {
     this.view.loadHTML(response)
     this.responseLoaded = true
-    this.notifyApplicationOfPageChange()
+    this.notifyApplicationAfterResponseLoad()
+    this.notifyApplicationAfterPageLoad()
   }
 
   // Current request
@@ -62,6 +65,7 @@ Turbolinks.Controller = class Controller {
 
   saveSnapshot() {
     if (this.responseLoaded) {
+      this.notifyApplicationBeforeSnapshotSave()
       const snapshot = this.view.saveSnapshot()
       this.cache.put(this.location, snapshot)
     }
@@ -76,7 +80,7 @@ Turbolinks.Controller = class Controller {
 
     if (snapshot) {
       this.view.loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition)
-      this.notifyApplicationOfSnapshotRestoration()
+      this.notifyApplicationAfterSnapshotLoad()
       return true
     }
   }
@@ -99,7 +103,7 @@ Turbolinks.Controller = class Controller {
   // Event handlers
 
   pageLoaded = () => {
-    this.notifyApplicationOfPageChange()
+    this.notifyApplicationAfterPageLoad()
   }
 
   clickCaptured = () => {
@@ -108,10 +112,10 @@ Turbolinks.Controller = class Controller {
   }
 
   clickBubbled = (event) => {
-    const location = this.getVisitableLocationForNode(event.target)
-
-    if (this.clickEventIsSignificant(event) && location) {
-      if (this.applicationAllowsChangingToLocation(location)) {
+    if (this.clickEventIsSignificant(event)) {
+      const link = this.getVisitableLinkForNode(event.target)
+      const location = this.getVisitableLocationForLink(link)
+      if (location && this.applicationAllowsFollowingLinkToLocation(link, location)) {
         event.preventDefault()
         this.visit(location)
       }
@@ -120,28 +124,43 @@ Turbolinks.Controller = class Controller {
 
   // Events
 
-  applicationAllowsChangingToLocation(location) {
-    return this.triggerEvent(
-      "page:before-change", { data: { url: location.absoluteURL }, cancelable: true }
+  applicationAllowsFollowingLinkToLocation(link, location) {
+    return this.dispatchEvent(
+      "turbolinks:click", {
+        target: link,
+        data: { url: location.absoluteURL },
+        cancelable: true
+      }
     )
   }
 
-  notifyApplicationOfSnapshotRestoration() {
-    this.triggerEvent("page:restore")
+  applicationAllowsVisitingLocation(location) {
+    return this.dispatchEvent(
+      "turbolinks:visit",
+      { data: { url: location.absoluteURL }, cancelable: true }
+    )
   }
 
-  notifyApplicationOfPageChange() {
-    this.triggerEvent("page:change")
-    this.triggerEvent("page:update")
+  notifyApplicationBeforeSnapshotSave() {
+    this.dispatchEvent("turbolinks:snapshot-save")
+  }
+
+  notifyApplicationAfterSnapshotLoad() {
+    this.dispatchEvent("turbolinks:snapshot-load")
+  }
+
+  notifyApplicationAfterResponseLoad() {
+    this.dispatchEvent("turbolinks:response-load")
+  }
+
+  notifyApplicationAfterPageLoad() {
+    this.dispatchEvent("turbolinks:load")
   }
 
   // Private
 
-  triggerEvent(eventName, { cancelable, data } = {}) {
-    const event = document.createEvent("Events")
-    event.initEvent(eventName, true, cancelable === true) // Second argument is bubbles?
-    event.data = data
-    document.dispatchEvent(event)
+  dispatchEvent() {
+    event = Turbolinks.dispatch(...arguments)
     return !event.defaultPrevented
   }
 
@@ -156,15 +175,16 @@ Turbolinks.Controller = class Controller {
     )
   }
 
-  getVisitableLocationForNode(node) {
-    const link = Turbolinks.closest(node, "a[href]:not([target])")
+  getVisitableLinkForNode(node) {
+    if(this.nodeIsVisitable(node)) {
+      return Turbolinks.closest(node, "a[href]:not([target])")
+    }
+  }
 
-    if (this.nodeIsVisitable(node) && link) {
-      const turbo_location = new Turbolinks.Location(link.href)
-
-      if (turbo_location.isSameOrigin()) {
-        return turbo_location
-      }
+  getVisitableLocationForLink(link) {
+    const location = new Turbolinks.Location(link.href)
+    if (location.isSameOrigin()) {
+      return location
     }
   }
 

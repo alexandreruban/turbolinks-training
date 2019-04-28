@@ -22,7 +22,7 @@ Turbolinks.Location = class Location {
   }
 
   getOrigin() {
-    this.absoluteURL.split("/", 3).join("/")
+    return this.absoluteURL.split("/", 3).join("/")
   }
 
   isSameOrigin() {

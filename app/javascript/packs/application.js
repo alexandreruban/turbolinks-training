@@ -1,5 +1,6 @@
 import "../src/turbolinks";
 import "../src/turbolinks/helpers";
+import "../src/turbolinks/compatibility";
 import "../src/turbolinks/progress_bar";
 import "../src/turbolinks/element_set";
 import "../src/turbolinks/element_pool";
