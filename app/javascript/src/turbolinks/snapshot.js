@@ -61,7 +61,7 @@ Turbolinks.Snapshot = class Snapshot {
 
   getPermanentHeadElementSet() {
     const permanentHeadElementSet = this.getHeadElementSet().selectElementsMatchingSelector(
-      "style, link[rel=stylesheet], script, [data-turbolinks-track=reload], [data-turbolinks-permanent]"
+      "style, link[href], script, [data-turbolinks-track=reload]"
     )
     if (permanentHeadElementSet) {
       this.permanentHeadElementSet = permanentHeadElementSet
