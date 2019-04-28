@@ -5,10 +5,10 @@ Turbolinks.View = class View{
 
   loadHTML(html) {
     const snapshot = Turbolinks.Snapshot.fromHTML(html)
-    this.loadSnapshotByScrollingToSavedPosition(snapshot, "anchor", true)
+    this.loadSnapshotByScrollingToSavedPosition(snapshot, false)
   }
 
-  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition, fromHTML) {
+  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition) {
     if (this.loadSnapshot(snapshot)) {
       this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
     }
@@ -49,16 +49,13 @@ Turbolinks.View = class View{
   scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition) {
     const location = window.location.toString()
 
-    scrollTo(0, 0)
-    // if (scrollToSavedPosition && snapshotOffsets) {
-    //   const xOffset = snapshotOffsets.left || 0
-    //   const yOffset = snapshotOffsets.top  || 0
-    //   scrollTo(xOffset, yOffset)
-    // } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
-    //   document.querySelector(window.location.hash).scrollIntoView()
-    // } else {
-    //   scrollTo(0, 0)
-    // }
+    if (scrollToSavedPosition && snapshot.hasScrollPosition()) {
+      scrollTo(snapshot.scrollLeft, snapshot.scrollTop)
+    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
+      document.querySelector(window.location.hash).scrollIntoView()
+    } else if (this.lastScrolledLocation != location) {
+      scrollTo(0, 0)
+    }
 
     this.lastScrolledLocation = location
   }

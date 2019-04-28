@@ -11,8 +11,12 @@ Turbolinks.Snapshot = class Snapshot {
   constructor({ head, body, scrollLeft, scrollTop }) {
     this.head = head
     this.body = body
-    this.scrollLeft = scrollLeft || 0
-    this.scrollTop = scrollTop || 0
+    this.scrollLeft = scrollLeft
+    this.scrollTop = scrollTop
+  }
+
+  hasScrollPosition() {
+    return (this.scrollTop != null && this.scrollLeft != null)
   }
 
   hasSameTrackedHeadElementsAsSnapshot(snapshot) {
