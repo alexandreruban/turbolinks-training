@@ -1,7 +1,7 @@
 Turbolinks.HttpRequest = class HttpRequest {
   constructor(delegate, location) {
     this.delegate = delegate
-    this.location = location
+    this.location = Turbolinks.Location.box(location)
     this.xhr = new XMLHttpRequest
     this.xhr.open("GET", this.location.requestURL, true)
     this.xhr.setRequestHeader("Accept", "text/html, application/xhtml+xml, application/xml")
