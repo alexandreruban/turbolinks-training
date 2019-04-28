@@ -19,16 +19,8 @@ const closest = () => {
   }
 }
 
-Turbolinks.match = (element, selector) => {
-  return match().call(element, selector)
-}
-
-const match = () => {
-  html = document.documentElement
-  return html.matchesSelector ||
-         html.webkitMatchesSelector ||
-         html.msMatchesSelector ||
-         html.mozMatchesSelector
+Turbolinks.defer = (callback) => {
+  setTimeout(callback, 1)
 }
 
 Turbolinks.dispatch = (eventName, { target, cancelable, data } = {}) => {
@@ -42,4 +34,16 @@ Turbolinks.dispatch = (eventName, { target, cancelable, data } = {}) => {
   }
 
   return event
+}
+
+Turbolinks.match = (element, selector) => {
+  return match().call(element, selector)
+}
+
+const match = () => {
+  html = document.documentElement
+  return html.matchesSelector ||
+         html.webkitMatchesSelector ||
+         html.msMatchesSelector ||
+         html.mozMatchesSelector
 }

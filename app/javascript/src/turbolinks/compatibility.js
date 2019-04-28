@@ -1,6 +1,12 @@
+const { defer, dispatch } = Turbolinks
+
+const handleEvent = (eventName, handler) => {
+  document.addEventListener(eventName, handler, false)
+}
+
 const translateEvent = ({ from, to }) => {
   const handler = (event) => {
-    const compatible_event = Turbolinks.dispatch(to, {
+    const compatible_event = dispatch(to, {
         target: event.target,
         cancelable: event.cancelable,
         data: event.data
@@ -10,7 +16,7 @@ const translateEvent = ({ from, to }) => {
       compatible_event.preventDefault()
     }
   }
-  document.addEventListener(from, handler, false)
+  handleEvent(from, handler)
 }
 
 translateEvent({ from: "turbolinks:click", to: "page:before-change" })
@@ -21,10 +27,23 @@ translateEvent({ from: "turbolinks:snapshot-load", to: "page:restore" })
 translateEvent({ from: "turbolinks:load", to: "page:change" })
 translateEvent({ from: "turbolinks:load", to: "page:update" })
 
+let loaded = false
+handleEvent("DOMContentLoaded", () => {
+  defer(() => {
+    return loaded = true
+  })
+})
+
+handleEvent("turbolinks:load", () => {
+  if (loaded) {
+    dispatch("page:load")
+  }
+})
+
 if (typeof jQuery === "function") {
   jQuery(document).on("ajaxSuccess", (event, xhr, settings) => {
     if (jQuery.trim(xhr.responseText).length > 0) {
-      Turbolinks.dispatch("page-update")
+      dispatch("page-update")
     }
   })
 }
