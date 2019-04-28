@@ -3,7 +3,12 @@ Turbolinks.View = class View{
     this.delegate = delegate
   }
 
-  loadHTML(html) {
+  loadDocumentHTML(html) {
+    document.documentElement.innerHTML = html
+    activateScripts()
+  }
+
+  loadSnapshotHTML(html) {
     const snapshot = Turbolinks.Snapshot.fromHTML(html)
     this.loadSnapshotByScrollingToSavedPosition(snapshot, false)
   }
@@ -102,5 +107,23 @@ Turbolinks.View = class View{
     } else {
       return element
     }
+  }
+
+  activeScripts = () => {
+    document.querySelectorAll("script").forEach((oldChild) => {
+      const newChild = this.cloneScript(oldChild)
+      oldChild.parentNode.replaceChild(newChild, oldChild)
+    })
+  }
+
+  cloneScript = (script) => {
+    const element = document.createElement("script")
+    if (script.hasAttribute("src")) {
+      element.src = script.getAttribute("src")
+    } else {
+      element.textContent = script.textContent
+    }
+
+    return element
   }
 }

@@ -15,7 +15,7 @@ Turbolinks.HttpRequest = class HttpRequest {
     }
   }
 
-  abort() {
+  cancel() {
     if (this.xhr && this.sent) {
       this.xhr.abort()
     }
@@ -34,6 +34,7 @@ Turbolinks.HttpRequest = class HttpRequest {
       if (200 <= this.xhr.status && this.xhr.status < 300) {
         this.delegate.requestCompletedWithResponse(this.xhr.responseText)
       } else {
+        this.failed = true
         this.delegate.requestFailedWithStatusCode(this.xhr.status, this.xhr.responseText)
       }
     })
@@ -41,11 +42,12 @@ Turbolinks.HttpRequest = class HttpRequest {
 
   requestFailed = () => {
     this.endRequest(() => {
+      this.failed = true
       this.delegate.requestFailedWithStatusCode(null)
     })
   }
 
-  requestAborted = () => {
+  requestCanceled = () => {
     this.endRequest()
   }
 
@@ -72,7 +74,7 @@ Turbolinks.HttpRequest = class HttpRequest {
     this.xhr.onprogress = this.requestProgressed
     this.xhr.onloadend = this.requestLoaded
     this.xhr.onerror = this.requestFailed
-    this.xhr.onabort = this.requestAborted
+    this.xhr.onabort = this.requestCanceled
   }
 
   endRequest(callback) {
@@ -85,7 +87,9 @@ Turbolinks.HttpRequest = class HttpRequest {
 
   setProgress(progress) {
     this.progress = progress
-    this.delegate.requestProgressed(this.progress)
+    if (typeof this.delegate.requestProgressed === "function") {
+      this.delegate.requestProgressed(this.progress)
+    }
   }
 
   destroy() {

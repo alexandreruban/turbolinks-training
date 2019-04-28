@@ -28,7 +28,7 @@ Turbolinks.Controller = class Controller {
   visit(location) {
     const turbo_location = Turbolinks.Location.box(location)
     if (this.applicationAllowsVisitingLocation(turbo_location)) {
-      this.adapter.visitLocation(turbo_location)
+      this.startVisit(turbo_location, "advance", false)
     }
   }
 
@@ -43,22 +43,15 @@ Turbolinks.Controller = class Controller {
   }
 
   loadResponse(response) {
-    this.view.loadHTML(response)
+    this.view.loadSnapshotHTML(response)
     this.responseLoaded = true
     this.notifyApplicationAfterResponseLoad()
     this.notifyApplicationAfterPageLoad()
   }
 
-  // Current request
-
-  issueRequestForLocation(location) {
-    this.abortCurrentRequest()
-    this.request = new Turbolinks.HttpRequest(this.adapter, this.location)
-    this.request.send()
-  }
-
-  abortCurrentRequest() {
-    if (this.request) { this.request.abort() }
+  loadErrorResponse(response) {
+    this.view.loadDocumentHTML(response)
+    this.controller.stop()
   }
 
   // Page snapshots
@@ -75,10 +68,11 @@ Turbolinks.Controller = class Controller {
     return this.cache.has(location)
   }
 
-  restoreSnapshotByScrollingToSavedPosition(scrollToSavedPosition) {
-    const snapshot = this.cache.get(this.location)
+  restoreSnapshotForVisit(visit) {
+    const snapshot = this.cache.get(visit.location)
 
     if (snapshot) {
+      const scrollToSavedPosition = visit.action === "restore"
       this.view.loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition)
       this.notifyApplicationAfterSnapshotLoad()
       return true
@@ -97,7 +91,10 @@ Turbolinks.Controller = class Controller {
     this.saveSnapshot()
     this.responseLoaded = false
     this.location = location
-    this.adapter.locationChangedByActor(location, actor)
+
+    if (actor === "history") {
+      this.startVisit(location, "restore", true)
+    }
   }
 
   // Event handlers
@@ -160,6 +157,14 @@ Turbolinks.Controller = class Controller {
   }
 
   // Private
+
+  startVisit(location, action, historyChanged) {
+    if (this.currentVisit) {
+      this.currentVisit.cancel()
+    }
+    this.currentVisit = new Turbolinks.Visit(this, location, action, historyChanged)
+    this.currentVisit.start()
+  }
 
   dispatchEvent() {
     event = Turbolinks.dispatch(...arguments)

@@ -10,5 +10,6 @@ import "../src/turbolinks/http_request";
 import "../src/turbolinks/cache";
 import "../src/turbolinks/view";
 import "../src/turbolinks/history";
+import "../src/turbolinks/visit";
 import "../src/turbolinks/browser_adapter";
 import "../src/turbolinks/controller";
