@@ -9,7 +9,7 @@ Turbolinks.ProgressBar = class ProgressBar {
         height: 3px;
         background: #0076ff;
         z-index: 9999;
-        transition: width ${this.DELAY}ms ease-out, opacity ${this.DELAY / 2}ms ease-in;
+        transition: width ${this.DELAY}ms ease-out, opacity ${this.DELAY / 2}ms ${this.DELAY / 2}ms ease-in;
         transform: translate3d(0, 0, 0);
       }
     `;
@@ -42,7 +42,7 @@ Turbolinks.ProgressBar = class ProgressBar {
 
   setValue(value) {
     this.value = value
-    this.progressElement.style.width = `${10 + (this.value * 90)}%`
+    this.refresh()
   }
 
   // Private
@@ -55,6 +55,7 @@ Turbolinks.ProgressBar = class ProgressBar {
     this.progressElement.style.width = 0
     this.progressElement.style.opacity = 1
     document.documentElement.insertBefore(this.progressElement, document.body)
+    this.refresh()
   }
 
   fadeProgressElement(callback) {
@@ -79,6 +80,12 @@ Turbolinks.ProgressBar = class ProgressBar {
 
   trickle = () => {
     this.setValue(this.value + Math.random() / 100)
+  }
+
+  refresh() {
+    return requestAnimationFrame(() => {
+      return this.progressElement.style.width = `${10 + (this.value * 90)}%`
+    })
   }
 
   createStylesheetElement() {

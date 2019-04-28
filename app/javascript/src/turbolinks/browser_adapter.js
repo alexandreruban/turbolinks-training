@@ -1,4 +1,6 @@
 Turbolinks.BrowserAdapter = class BrowserAdapter {
+  static PROGRESS_BAR_DELAY = 500
+
   constructor(controller) {
     this.progressBar = new Turbolinks.ProgressBar
     this.controller = controller
@@ -14,7 +16,8 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   }
 
   requestStarted() {
-    this.progressBar.show()
+    this.showProgressBarAfterDelay()
+    this.progressBar.setValue(0)
   }
 
   requestProgressed(progress) {
@@ -30,10 +33,28 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   }
 
   requestFinished() {
-    this.progressBar.hide()
+    this.hideProgressBar()
   }
 
   pageInvalidated() {
     window.location.reload()
+  }
+
+  // Private
+
+  showProgressBarAfterDelay() {
+    this.progressBarTimeout = setTimeout(
+      this.showProgressBar,
+      this.constructor.PROGRESS_BAR_DELAY
+    )
+  }
+
+  showProgressBar = () => {
+    this.progressBar.show()
+  }
+
+  hideProgressBar() {
+    this.progressBar.hide()
+    clearTimeout(this.progressBarTimeout)
   }
 }
