@@ -1,5 +1,5 @@
 Turbolinks.ProgressBar = class ProgressBar {
-    static DELAY = 300;
+    static ANIMAMTION_DURATION = 300;
     static defaultCSS = `
       .turbolinks-progress-bar {
         position: fixed;
@@ -9,7 +9,7 @@ Turbolinks.ProgressBar = class ProgressBar {
         height: 3px;
         background: #0076ff;
         z-index: 9999;
-        transition: width ${this.DELAY}ms ease-out, opacity ${this.DELAY / 2}ms ${this.DELAY / 2}ms ease-in;
+        transition: width ${this.ANIMAMTION_DURATION}ms ease-out, opacity ${this.ANIMAMTION_DURATION / 2}ms ${this.ANIMAMTION_DURATION / 2}ms ease-in;
         transform: translate3d(0, 0, 0);
       }
     `;
@@ -60,7 +60,7 @@ Turbolinks.ProgressBar = class ProgressBar {
 
   fadeProgressElement(callback) {
     this.progressElement.style.opacity = 0
-    setTimeout(callback, this.constructor.DELAY * 1.5)
+    setTimeout(callback, this.constructor.ANIMAMTION_DURATION * 1.5)
   }
 
   uninstallProgressElement() {
@@ -69,7 +69,7 @@ Turbolinks.ProgressBar = class ProgressBar {
 
   startTrickling() {
     if (!this.trickleInterval) {
-      this.trickleInterval = setInterval(this.trickle, this.constructor.DELAY)
+      this.trickleInterval = setInterval(this.trickle, this.constructor.ANIMAMTION_DURATION)
     }
   }
 
