@@ -18,7 +18,7 @@ Turbolinks.HttpRequest = class HttpRequest {
   }
 
   abort() {
-    if (this.xhr && !this.sent) {
+    if (this.xhr && this.sent) {
       this.xhr.abort()
     }
   }
