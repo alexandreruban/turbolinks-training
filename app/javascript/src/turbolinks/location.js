@@ -10,14 +10,15 @@ Turbolinks.Location = class Location {
   constructor(url = "") {
     const linkWithAnchor = document.createElement("a")
     linkWithAnchor.href = url.toString()
+
     this.absoluteURL = linkWithAnchor.href
 
-    if (linkWithAnchor.hash.length < 2) {
+    const hashLength = linkWithAnchor.hash.length
+
+    if (hashLength < 2) {
       this.requestURL = this.absoluteURL
     } else {
-      const linkWithoutAnchor = linkWithAnchor.cloneNode()
-      linkWithoutAnchor.hash = ""
-      this.requestURL = linkWithoutAnchor.href
+      this.requestURL = this.absoluteURL.slice(0, -hashLength)
     }
   }
 
