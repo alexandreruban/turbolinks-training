@@ -1,5 +1,6 @@
 Turbolinks.BrowserAdapter = class BrowserAdapter {
   constructor(controller) {
+    this.progressBar = new Turbolinks.ProgressBar
     this.controller = controller
   }
 
@@ -12,8 +13,12 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
     this.controller.issueRequestForLocation(location)
   }
 
+  requestStarted() {
+    this.progressBar.show()
+  }
+
   requestProgressed(progress) {
-    console.log("request progressed", progress)
+    this.progressBar.setValue(progress)
   }
 
   requestCompletedWithResponse(response) {
@@ -22,6 +27,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
 
   requestFailedWithStatusCode(statusCode, response) {
     console.error("FAILED REQUEST:", statusCode)
+  }
+
+  requestFinished() {
+    this.progressBar.hide()
   }
 
   pageInvalidated() {

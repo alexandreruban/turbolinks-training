@@ -15,7 +15,8 @@ Turbolinks.HttpRequest = class HttpRequest {
     if (this.xhr && !this.sent) {
       this.setProgress(0)
       this.xhr.send()
-      return this.sent = true
+      this.sent = true
+      this.delegate.requestStarted()
     }
   }
 
@@ -30,8 +31,6 @@ Turbolinks.HttpRequest = class HttpRequest {
   requestProgressed = (event) => {
     if (event.lengthComputable) {
       this.setProgress(event.loaded / event.total)
-    } else {
-      this.incrementProgressIndeterminately()
     }
   }
 
@@ -60,12 +59,9 @@ Turbolinks.HttpRequest = class HttpRequest {
     this.delegate.requestProgressed(this.progress)
   }
 
-  incrementProgressIndeterminately() {
-    this.setProgress(this.progress + (1 - this.progress) * 0.1)
-  }
-
   destroy() {
     this.setProgress(1)
+    this.delegate.requestFinished()
     this.delegate = null
     this.xhr = null
   }
