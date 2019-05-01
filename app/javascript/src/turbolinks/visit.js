@@ -28,6 +28,7 @@ Turbolinks.Visit = class Visit {
       if (this.request) {
         this.request.cancel()
       }
+      this.cancelRender()
       this.state = "canceled"
     }
   }
@@ -166,5 +167,11 @@ Turbolinks.Visit = class Visit {
       this.frame = null
       callback.call(this)
     })
+  }
+
+  cancelRender() {
+    if (this.frame) {
+      cancelAnimationFrame(this.frame)
+    }
   }
 }
