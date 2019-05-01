@@ -14,7 +14,7 @@ Turbolinks.View = class View{
   }
 
   loadSnapshotWithAction(snapshot, action) {
-    if (this.loadSnapshot(snapshot)) {
+    if (this.renderSnapshot(snapshot)) {
       const scrollToSavedPosition = action === "restore"
       this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
     }
@@ -26,7 +26,7 @@ Turbolinks.View = class View{
 
   // Private
 
-  loadSnapshot(newSnapshot) {
+  renderSnapshot(newSnapshot) {
     const currentSnapshot = this.getSnapshot(false)
     if (!currentSnapshot.hasSameTrackedHeadElementsAsSnapshot(newSnapshot)) {
       this.delegate.viewInvalidated()
@@ -49,6 +49,8 @@ Turbolinks.View = class View{
     this.importPermanentElementsIntoBody(newBody)
     this.importRecyclableElementsIntoBody(newBody)
     document.body = newBody
+
+    this.delegate.viewRendered()
     return newSnapshot
   }
 

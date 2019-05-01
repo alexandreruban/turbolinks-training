@@ -2,7 +2,7 @@ Turbolinks.Visit = class Visit {
   static ID_PREFIX = new Date().getTime();
   static id = 0;
 
-  constructor(controller, previousLocation, location, action, historyChanged) {
+  constructor(controller, location, action, historyChanged) {
     this.identifier = `${this.constructor.ID_PREFIX}:${this.constructor.id++}`
     this.controller = controller
     this.action = action
@@ -10,7 +10,6 @@ Turbolinks.Visit = class Visit {
     this.promise = new Promise((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject
-      this.previousLocation = Turbolinks.Location.box(previousLocation)
       this.location = Turbolinks.Location.box(location)
       this.adapter = this.controller.adapter
       this.state = "initialized"
@@ -150,7 +149,7 @@ Turbolinks.Visit = class Visit {
 
   saveSnapshot() {
     if (!this.snapshotSaved) {
-      this.controller.saveSnapshotForLocation(this.previousLocation)
+      this.controller.saveSnapshot()
       this.snapshotSaved = true
     }
   }

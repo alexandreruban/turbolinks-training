@@ -61,9 +61,14 @@ Turbolinks.Controller = class Controller {
     return this.cache.has(location)
   }
 
-  saveSnapshotForLocation(location) {
+  saveSnapshot() {
     this.notifyApplicationBeforeSnapshotSave()
     const snapshot = this.view.saveSnapshot()
+    if (this.lastRenderedVisit && this.lastRenderedVisit.location) {
+      const location = this.lastRenderedVisit.location
+    } else {
+      const location = this.location
+    }
     this.cache.put(location, snapshot)
   }
 
@@ -81,6 +86,10 @@ Turbolinks.Controller = class Controller {
 
   viewInvalidated() {
     this.adapter.pageInvalidated()
+  }
+
+  viewRendered() {
+    this.lastRenderedVisit = this.currentVisit
   }
 
   // History delegate
@@ -145,7 +154,7 @@ Turbolinks.Controller = class Controller {
     this.dispatchEvent("turbolinks:response-load")
   }
 
-  notifyApplicationAfterPageLoad = () => {
+  notifyApplicationAfterPageLoad() {
     this.dispatchEvent("turbolinks:load")
   }
 
@@ -160,9 +169,13 @@ Turbolinks.Controller = class Controller {
   }
 
   createVisit(location, action, historyChanged) {
-    const visit = new Turbolinks.Visit(this, this.location, location, action, historyChanged)
-    visit.then(this.notifyApplicationAfterPageLoad)
+    const visit = new Turbolinks.Visit(this, location, action, historyChanged)
+    visit.then(this.visitFinished)
     return visit
+  }
+
+  visitFinished = () => {
+    this.notifyApplicationAfterPageLoad()
   }
 
   dispatchEvent() {
