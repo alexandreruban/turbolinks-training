@@ -1,5 +1,9 @@
 Turbolinks.Visit = class Visit {
+  static ID_PREFIX = new Date().getTime();
+  static id = 0;
+
   constructor(controller, previousLocation, location, action, historyChanged) {
+    this.identifier = `${this.constructor.ID_PREFIX}:${this.constructor.id++}`
     this.controller = controller
     this.action = action
     this.historyChanged = historyChanged
