@@ -1,7 +1,7 @@
 Turbolinks = {
   supported: true,
 
-  visit(url) {
-    Turbolinks.controller.visit(url)
+  visit(location, options) {
+    Turbolinks.controller.visit(location, options)
   }
 }

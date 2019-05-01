@@ -24,10 +24,11 @@ Turbolinks.Controller = class Controller {
     }
   }
 
-  visit(location) {
+  visit(location, options = {}) {
     const turbo_location = Turbolinks.Location.box(location)
     if (this.applicationAllowsVisitingLocation(turbo_location)) {
-      this.adapter.visitProposedToLocationWithAction(location, "advance")
+      const action = options.action ? options.action : "advance"
+      this.adapter.visitProposedToLocationWithAction(location, action)
     }
   }
 
@@ -113,7 +114,8 @@ Turbolinks.Controller = class Controller {
         const location = this.getVisitableLocationForLink(link)
         if (location && this.applicationAllowsFollowingLinkToLocation(link, location)) {
           event.preventDefault()
-          this.visit(location)
+          const action = this.getActionForLink(link)
+          this.visit(location, { action })
         }
       }
     }
@@ -200,6 +202,14 @@ Turbolinks.Controller = class Controller {
     const location = new Turbolinks.Location(link.href)
     if (location.isSameOrigin()) {
       return location
+    }
+  }
+
+  getActionForLink(link) {
+    if (link.getAttribute("data-turbolinks-action")) {
+      return link.getAttribute("data-turbolinks-action")
+    } else {
+      return "advance"
     }
   }
 

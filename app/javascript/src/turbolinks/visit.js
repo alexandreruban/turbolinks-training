@@ -61,8 +61,9 @@ Turbolinks.Visit = class Visit {
     this.promise.catch(...arguments)
   }
 
-  changeHistory(method = "pushHistory") {
+  changeHistory() {
     if (!this.historyChanged) {
+      const method = this.getHistoryMethodForAction(this.action)
       this.controller[method](this.location)
       this.historyChanged = true
     }
@@ -143,6 +144,17 @@ Turbolinks.Visit = class Visit {
   }
 
   // Private
+
+  getHistoryMethodForAction = (action) => {
+    switch (action) {
+      case "advance":
+        return "pushHistory"
+      case "replace":
+        return "replaceHistory"
+      case "restore":
+        return "pushHistory"
+    }
+  }
 
   shouldIssueRequest() {
     return (this.action === "advance" || !this.hasSnapshot())
