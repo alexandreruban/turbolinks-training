@@ -77,7 +77,7 @@ Turbolinks.Visit = class Visit {
   }
 
   restoreSnapshot() {
-    if (!this.snapshotRestored) {
+    if (this.hasSnapshot() && !this.snapshotRestored) {
       this.saveSnapshot()
       this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
       if (this.snapshotRestored) {
