@@ -1,11 +1,11 @@
 Turbolinks.History = class History {
   constructor(delegate) {
     this.delegate = delegate
-    this.state = { turbolinks: true }
   }
 
   start() {
     if (!this.started) {
+      this.update("replace", null)
       addEventListener("popstate", this.onPopState, false)
       this.started = true
     }
@@ -20,12 +20,6 @@ Turbolinks.History = class History {
 
   push(location) {
     const turbo_location = Turbolinks.Location.box(location)
-
-    if (!this.initialized) {
-      this.update("replace", null)
-      this.initialized = true
-    }
-
     this.update("push", turbo_location)
   }
 
@@ -38,14 +32,28 @@ Turbolinks.History = class History {
 
   onPopState = (event) => {
     if (event.state && event.state.turbolinks) {
-      const turbo_location = Turbolinks.Location.box(location)
-      this.delegate.historyPoppedToLocation(turbo_location)
+      const turbolinks = event.state.turbolinks
+      const turbo_location = Turbolinks.Location.box(window.location)
+      this.restorationIdentifier = turbolinks.restorationIdentifier
+      this.delegate.historyPoppedToLocationWithRestaurationIdentifier(turbo_location, this.restorationIdentifier)
     }
   }
 
   // Private
 
   update(method, location) {
-    history[method + "State"](this.state, null, location)
+    const state = this.createState()
+    this.restorationIdentifier = state.restorationIdentifier
+    history[method + "State"](state, null, location)
+  }
+
+  createState = () => {
+    time = new Date().getTime()
+    entropy = Math.floor(Math.random() * 1000, 10) + 1
+    return {
+      turbolinks: {
+        restorationIdentifier: `${time}.${entropy}`
+      }
+    }
   }
 }

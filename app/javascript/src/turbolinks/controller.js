@@ -1,10 +1,11 @@
 Turbolinks.Controller = class Controller {
   constructor() {
+    this.location = Turbolinks.Location.box(window.location)
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
-    this.scrollManager = new Turbolinks.ScrollManager
     this.cache = new Turbolinks.Cache(10)
-    this.location = Turbolinks.Location.box(window.location)
+    this.scrollManager = new Turbolinks.ScrollManager(this)
+    this.restorationData = {}
   }
 
   start() {
@@ -88,7 +89,7 @@ Turbolinks.Controller = class Controller {
     if (element) {
       this.scrollToElement(element)
     } else {
-      scrollToPosition(0, 0)
+      scrollToPosition({ x: 0, y: 0 })
     }
   }
 
@@ -96,8 +97,15 @@ Turbolinks.Controller = class Controller {
     this.scrollManager.scrollToElement(element)
   }
 
-  scrollToPosition(x, y) {
-    this.scrollManager.scrollToPosition(x, y)
+  scrollToPosition(position) {
+    this.scrollManager.scrollToPosition(position)
+  }
+
+  // Scroll Manager delegate
+
+  scrollPositionChanged(scrollPosition) {
+    const restorationData = this.getCurrentResturationData()
+    restorationData.scrollPosition = scrollPosition
   }
 
   // View delegate
@@ -112,8 +120,8 @@ Turbolinks.Controller = class Controller {
 
   // History delegate
 
-  historyPoppedToLocation(location) {
-    this.startVisit(location, "restore", true)
+  historyPoppedToLocationWithRestaurationIdentifier(location, restorationIdentifier) {
+    this.startVisit(location, "restore", restorationIdentifier)
     this.location = location
   }
 
@@ -180,11 +188,12 @@ Turbolinks.Controller = class Controller {
 
   // Private
 
-  startVisit(location, action, historyChanged) {
+  startVisit(location, action, historyChanged, restorationIdentifier) {
     if (this.currentVisit) {
       this.currentVisit.cancel()
     }
     this.currentVisit = this.createVisit(location, action, historyChanged)
+    this.currentVisit.restorationData = this.getRestaurationDataForIdentifier(restorationIdentifier)
     this.currentVisit.start()
   }
 
@@ -241,6 +250,18 @@ Turbolinks.Controller = class Controller {
       return container.getAttribute("data-turbolinks") != "false"
     } else {
       return true
+    }
+  }
+
+  getCurrentResturationData() {
+    return this.getRestaurationDataForIdentifier(this.history.restorationIdentifier)
+  }
+
+  getRestaurationDataForIdentifier(identifier) {
+    if (this.restorationData && this.restorationData[identifier]) {
+      return this.restorationData[identifier]
+    } else {
+      return {}
     }
   }
 }
