@@ -27,8 +27,7 @@ Turbolinks.Controller = class Controller {
   visit(location) {
     const turbo_location = Turbolinks.Location.box(location)
     if (this.applicationAllowsVisitingLocation(turbo_location)) {
-      const visit = this.createVisit(turbo_location, "advance", false)
-      this.adapter.visitProposed(visit)
+      this.adapter.visitProposedToLocationWithAction(location, "advance")
     }
   }
 
@@ -50,6 +49,10 @@ Turbolinks.Controller = class Controller {
   loadErrorResponse(response) {
     this.view.loadDocumentHTML(response)
     this.controller.stop()
+  }
+
+  startVisitToLocationWithAction(location, action) {
+    this.startVisit(location, action)
   }
 
   // Page snapshots

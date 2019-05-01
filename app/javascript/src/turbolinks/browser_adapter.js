@@ -1,12 +1,13 @@
 Turbolinks.BrowserAdapter = class BrowserAdapter {
   static PROGRESS_BAR_DELAY = 500;
 
-  constructor() {
+  constructor(controller) {
+    this.controller = controller
     this.progressBar = new Turbolinks.ProgressBar
   }
 
-  visitProposed(visit) {
-    visit.start()
+  visitProposedToLocationWithAction(location, action) {
+    this.controller.startVisitToLocationWithAction(location, action)
   }
 
   visitStarted(visit) {
