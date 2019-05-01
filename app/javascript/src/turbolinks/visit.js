@@ -9,8 +9,12 @@ Turbolinks.Visit = class Visit {
 
   start() {
     if (!this.started) {
-      this.started = true
-      this.adapter.visitStarted(this)
+      return this.promise = new Promise((resolve, reject) => {
+        this.resolve = resolve
+        this.reject = reject
+        this.started = true
+        this.adapter.visitStarted(this)
+      })
     }
   }
 
@@ -41,6 +45,9 @@ Turbolinks.Visit = class Visit {
   restoreSnapshot() {
     if (!this.snapshotRestored) {
       this.snapshotRestored = this.controller.restoreSnapshotForVisit(this)
+      if (!this.shouldIssueRequest()) {
+        this.resolve()
+      }
     }
   }
 
@@ -48,8 +55,10 @@ Turbolinks.Visit = class Visit {
     if (this.response) {
       if (this.request.failed) {
         this.controller.loadErrorResponse(this.response)
+        this.reject()
       } else {
         this.controller.loadResponse(this.response)
+        this.resolve()
       }
     }
   }

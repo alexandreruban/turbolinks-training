@@ -46,7 +46,6 @@ Turbolinks.Controller = class Controller {
     this.view.loadSnapshotHTML(response)
     this.responseLoaded = true
     this.notifyApplicationAfterResponseLoad()
-    this.notifyApplicationAfterPageLoad()
   }
 
   loadErrorResponse(response) {
@@ -163,7 +162,9 @@ Turbolinks.Controller = class Controller {
       this.currentVisit.cancel()
     }
     this.currentVisit = new Turbolinks.Visit(this, location, action, historyChanged)
-    this.currentVisit.start()
+    this.currentVisit.start().then(() => {
+      this.notifyApplicationAfterPageLoad()
+    })
   }
 
   dispatchEvent() {
