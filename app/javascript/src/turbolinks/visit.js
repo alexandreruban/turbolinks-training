@@ -77,13 +77,15 @@ Turbolinks.Visit = class Visit {
 
   restoreSnapshot() {
     if (this.hasSnapshot() && !this.snapshotRestored) {
-      this.saveSnapshot()
-      this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
-      if (this.snapshotRestored) {
-        if (typeof this.adapter.visitSnapshotRestored === "function") {
-          this.adapter.visitSnapshotRestored(this)
+      this.render(() => {
+        this.saveSnapshot()
+        this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
+        if (this.snapshotRestored) {
+          if (typeof this.adapter.visitSnapshotRestored === "function") {
+            this.adapter.visitSnapshotRestored(this)
+          }
         }
-      }
+      })
 
       if (!this.shouldIssueRequest()) {
         this.complete()
@@ -93,20 +95,22 @@ Turbolinks.Visit = class Visit {
 
   loadResponse() {
     if (this.response) {
-      this.saveSnapshot()
-      if (this.request.failed) {
-        this.controller.loadErrorResponse(this.response)
-        if (typeof this.adapter.visitResponseLoaded === "function") {
-          this.adapter.visitResponseLoaded(this)
+      this.render(() => {
+        this.saveSnapshot()
+        if (this.request.failed) {
+          this.controller.loadErrorResponse(this.response)
+          if (typeof this.adapter.visitResponseLoaded === "function") {
+            this.adapter.visitResponseLoaded(this)
+          }
+          this.fail()
+        } else {
+          this.controller.loadResponse(this.response)
+          if (typeof this.adapter.visitResponseLoaded === "function") {
+            this.adapter.visitResponseLoaded(this)
+          }
+          this.complete()
         }
-        this.fail()
-      } else {
-        this.controller.loadResponse(this.response)
-        if (typeof this.adapter.visitResponseLoaded === "function") {
-          this.adapter.visitResponseLoaded(this)
-        }
-        this.complete()
-      }
+      })
     }
   }
 
@@ -152,5 +156,15 @@ Turbolinks.Visit = class Visit {
       this.controller.saveSnapshot()
       this.snapshotSaved = true
     }
+  }
+
+  render(callback) {
+    if (this.frame) {
+      cancelAnimationFrame(this.frame)
+    }
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null
+      callback.call(this)
+    })
   }
 }
