@@ -17,10 +17,14 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
   }
 
   visitRequestStarted(visit) {
-    if (!visit.snapshotRestored) {
-      this.showProgressBarAfterDelay()
-    }
     this.progressBar.setValue(0)
+    if (!visit.snapshotRestored) {
+      if (visit.hasSnapshot() || visit.action != "restore") {
+        this.showProgressBarAfterDelay()
+      } else {
+        this.showProgressBar()
+      }
+    }
   }
 
   visitRequestProgressed(visit) {
