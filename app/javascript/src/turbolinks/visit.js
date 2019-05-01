@@ -119,7 +119,9 @@ Turbolinks.Visit = class Visit {
   // HTTP Request delegate
 
   requestStarted() {
-    this.adapter.visitRequestStarted(this)
+    if (typeof this.adapter.visitRequestStarted === "function") {
+      this.adapter.visitRequestStarted(this)
+    }
   }
 
   requestProgressed(progress) {
@@ -140,7 +142,9 @@ Turbolinks.Visit = class Visit {
   }
 
   requestFinished() {
-    this.adapter.visitRequestFinished(this)
+    if (typeof this.adapter.visitRequestFinished === "function") {
+      this.adapter.visitRequestFinished(this)
+    }
   }
 
   // Private
