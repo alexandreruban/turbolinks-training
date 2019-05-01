@@ -64,12 +64,7 @@ Turbolinks.Controller = class Controller {
   saveSnapshot() {
     this.notifyApplicationBeforeSnapshotSave()
     const snapshot = this.view.saveSnapshot()
-    if (this.lastRenderedVisit && this.lastRenderedVisit.location) {
-      const location = this.lastRenderedVisit.location
-    } else {
-      const location = this.location
-    }
-    this.cache.put(location, snapshot)
+    this.cache.put(this.lastRenderedLocation, snapshot)
   }
 
   restoreSnapshotForLocationWithAction(location, action) {
@@ -89,7 +84,7 @@ Turbolinks.Controller = class Controller {
   }
 
   viewRendered() {
-    this.lastRenderedVisit = this.currentVisit
+    this.lastRenderedLocation = this.currentVisit.location
   }
 
   // History delegate
@@ -102,6 +97,7 @@ Turbolinks.Controller = class Controller {
   // Event handlers
 
   pageLoaded = () => {
+    this.lastRenderedLocation = this.location
     this.notifyApplicationAfterPageLoad()
   }
 
