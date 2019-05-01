@@ -13,12 +13,13 @@ Turbolinks.Location = class Location {
 
     this.absoluteURL = linkWithAnchor.href
 
-    const hashLength = linkWithAnchor.hash.length
+    const anchorLength = linkWithAnchor.hash.length
 
-    if (hashLength < 2) {
+    if (anchorLength < 2) {
       this.requestURL = this.absoluteURL
     } else {
-      this.requestURL = this.absoluteURL.slice(0, -hashLength)
+      this.requestURL = this.absoluteURL.slice(0, -anchorLength)
+      this.anchor = linkWithAnchor.hash.slice(1)
     }
   }
 

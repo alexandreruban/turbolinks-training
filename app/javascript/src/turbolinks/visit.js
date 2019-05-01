@@ -81,17 +81,17 @@ Turbolinks.Visit = class Visit {
     if (this.hasSnapshot() && !this.snapshotRestored) {
       this.render(() => {
         this.saveSnapshot()
-        this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
+        this.snapshotRestored = this.controller.restoreSnapshotForLocation(this.location)
         if (this.snapshotRestored) {
+          this.scrollToRestoredPosition()
           if (typeof this.adapter.visitSnapshotRestored === "function") {
             this.adapter.visitSnapshotRestored(this)
           }
+          if (!this.shouldIssueRequest()) {
+            this.complete()
+          }
         }
       })
-
-      if (!this.shouldIssueRequest()) {
-        this.complete()
-      }
     }
   }
 
@@ -101,12 +101,14 @@ Turbolinks.Visit = class Visit {
         this.saveSnapshot()
         if (this.request.failed) {
           this.controller.loadErrorResponse(this.response)
+          this.scrollToTop()
           if (typeof this.adapter.visitResponseLoaded === "function") {
             this.adapter.visitResponseLoaded(this)
           }
           this.fail()
         } else {
           this.controller.loadResponse(this.response)
+          this.scrollToAnchor()
           if (typeof this.adapter.visitResponseLoaded === "function") {
             this.adapter.visitResponseLoaded(this)
           }
@@ -144,6 +146,29 @@ Turbolinks.Visit = class Visit {
   requestFinished() {
     if (typeof this.adapter.visitRequestFinished === "function") {
       this.adapter.visitRequestFinished(this)
+    }
+  }
+
+  // Scrolling
+
+  scrollToTop() {
+    this.controller.scrollToPosition(0, 0)
+  }
+
+  scrollToAnchor() {
+    if (this.location && this.location.anchor) {
+      this.controller.scrollToAnchor(this.location.anchor)
+    } else {
+      this.scrollToTop()
+    }
+  }
+
+  scrollToRestoredPosition() {
+    const { x , y } = this.restorationData ? this.restorationData : {}
+    if (x && y) {
+      this.controller.scrollToPosition(x, y)
+    } else {
+      this.scrollToTop()
     }
   }
 

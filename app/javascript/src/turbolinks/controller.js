@@ -2,6 +2,7 @@ Turbolinks.Controller = class Controller {
   constructor() {
     this.history = new Turbolinks.History(this)
     this.view = new Turbolinks.View(this)
+    this.scrollManager = new Turbolinks.ScrollManager
     this.cache = new Turbolinks.Cache(10)
     this.location = Turbolinks.Location.box(window.location)
   }
@@ -11,6 +12,7 @@ Turbolinks.Controller = class Controller {
       addEventListener("click", this.clickCaptured, true)
       addEventListener("DOMContentLoaded", this.pageLoaded, false)
       this.history.start()
+      this.scrollManager.start()
       this.started = true
     }
   }
@@ -20,6 +22,7 @@ Turbolinks.Controller = class Controller {
       removeEventListener("click", this.clickCaptured, true)
       removeEventListener("DOMContentLoaded", this.pageLoaded, false)
       this.history.stop()
+      this.scrollManager.stop()
       this.started = false
     }
   }
@@ -68,14 +71,33 @@ Turbolinks.Controller = class Controller {
     this.cache.put(this.lastRenderedLocation, snapshot)
   }
 
-  restoreSnapshotForLocationWithAction(location, action) {
+  restoreSnapshotForLocation(location) {
     const snapshot = this.cache.get(location)
 
     if (snapshot) {
-      this.view.loadSnapshotWithAction(snapshot, action)
+      this.view.loadSnapshot(snapshot)
       this.notifyApplicationAfterSnapshotLoad()
       return true
     }
+  }
+
+  // Scrolling
+
+  scrollToAnchor(anchor) {
+    const element = document.getElementById(anchor)
+    if (element) {
+      this.scrollToElement(element)
+    } else {
+      scrollToPosition(0, 0)
+    }
+  }
+
+  scrollToElement(element) {
+    this.scrollManager.scrollToElement(element)
+  }
+
+  scrollToPosition(x, y) {
+    this.scrollManager.scrollToPosition(x, y)
   }
 
   // View delegate

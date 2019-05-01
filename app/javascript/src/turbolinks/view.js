@@ -10,14 +10,11 @@ Turbolinks.View = class View{
 
   loadSnapshotHTML(html) {
     const snapshot = Turbolinks.Snapshot.fromHTML(html)
-    this.loadSnapshotWithAction(snapshot, "advance")
+    this.loadSnapshot(snapshot)
   }
 
-  loadSnapshotWithAction(snapshot, action) {
-    if (this.renderSnapshot(snapshot)) {
-      const scrollToSavedPosition = action === "restore"
-      this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
-    }
+  loadSnapshot(snapshot) {
+    this.renderSnapshot(snapshot)
   }
 
   saveSnapshot() {
@@ -54,26 +51,10 @@ Turbolinks.View = class View{
     return newSnapshot
   }
 
-  scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition) {
-    const location = window.location.toString()
-
-    if (scrollToSavedPosition && snapshot.hasScrollPosition()) {
-      scrollTo(snapshot.scrollLeft, snapshot.scrollTop)
-    } else if (window.location.hash != "" && document.querySelector(window.location.hash)) {
-      document.querySelector(window.location.hash).scrollIntoView()
-    } else if (this.lastScrolledLocation != location) {
-      scrollTo(0, 0)
-    }
-
-    this.lastScrolledLocation = location
-  }
-
   getSnapshot = (clone) => {
     return new Turbolinks.Snapshot({
       head: this.maybeCloneElement(document.head, clone),
-      body: this.maybeCloneElement(document.body, clone),
-      scrollLeft: window.pageXOffset,
-      scrollTop: window.pageYOffset,
+      body: this.maybeCloneElement(document.body, clone)
     })
   }
 
