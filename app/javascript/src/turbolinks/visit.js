@@ -9,22 +9,43 @@ Turbolinks.Visit = class Visit {
       this.previousLocation = Turbolinks.Location.box(previousLocation)
       this.location = Turbolinks.Location.box(location)
       this.adapter = this.controller.adapter
+      this.state = "initialized"
     })
   }
 
   start() {
-    if (!this.started) {
-      this.started = true
+    if (this.state === "initialized") {
+      this.state = "started"
       this.adapter.visitStarted(this)
     }
   }
 
   cancel() {
-    if (this.started && !this.canceled) {
+    if (this.state === "started") {
       if (this.request) {
         this.request.cancel()
       }
-      this.canceled = true
+      this.state = "canceled"
+    }
+  }
+
+  complete() {
+    if (this.state === "started") {
+      this.state = "completed"
+      if (typeof this.adapter.visitCompleted === "function") {
+        this.adapter.visitCompleted(this)
+      }
+      this.resolve()
+    }
+  }
+
+  fail() {
+    if (this.state === "started") {
+      this.state = "failed"
+      if (typeof this.adapter.visitFailed === "function") {
+        this.adapter.visitFailed(this)
+      }
+      this.reject()
     }
   }
 
@@ -66,7 +87,7 @@ Turbolinks.Visit = class Visit {
       }
 
       if (!this.shouldIssueRequest()) {
-        this.resolve()
+        this.complete()
       }
     }
   }
@@ -76,13 +97,16 @@ Turbolinks.Visit = class Visit {
       this.saveSnapshot()
       if (this.request.failed) {
         this.controller.loadErrorResponse(this.response)
-        this.reject()
+        if (typeof this.adapter.visitResponseLoaded === "function") {
+          this.adapter.visitResponseLoaded(this)
+        }
+        this.fail()
       } else {
         this.controller.loadResponse(this.response)
-        this.resolve()
-      }
-      if (typeof this.adapter.visitResponseLoaded === "function") {
-        this.adapter.visitResponseLoaded(this)
+        if (typeof this.adapter.visitResponseLoaded === "function") {
+          this.adapter.visitResponseLoaded(this)
+        }
+        this.complete()
       }
     }
   }
