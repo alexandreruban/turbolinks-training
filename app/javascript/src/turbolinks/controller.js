@@ -27,7 +27,8 @@ Turbolinks.Controller = class Controller {
   visit(location) {
     const turbo_location = Turbolinks.Location.box(location)
     if (this.applicationAllowsVisitingLocation(turbo_location)) {
-      this.startVisit(turbo_location, "advance", false)
+      const visit = this.createVisit(turbo_location, "advance", false)
+      this.adapter.visitProposed(visit)
     }
   }
 
@@ -141,7 +142,7 @@ Turbolinks.Controller = class Controller {
     this.dispatchEvent("turbolinks:response-load")
   }
 
-  notifyApplicationAfterPageLoad() {
+  notifyApplicationAfterPageLoad = () => {
     this.dispatchEvent("turbolinks:load")
   }
 
@@ -151,10 +152,14 @@ Turbolinks.Controller = class Controller {
     if (this.currentVisit) {
       this.currentVisit.cancel()
     }
-    this.currentVisit = new Turbolinks.Visit(this, this.location, location, action, historyChanged)
-    this.currentVisit.start().then(() => {
-      this.notifyApplicationAfterPageLoad()
-    })
+    this.currentVisit = this.createVisit(location, action, historyChanged)
+    this.currentVisit.start()
+  }
+
+  createVisit(location, action, historyChanged) {
+    const visit = new Turbolinks.Visit(this, this.location, location, action, historyChanged)
+    visit.then(this.notifyApplicationAfterPageLoad)
+    return visit
   }
 
   dispatchEvent() {

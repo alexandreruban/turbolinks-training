@@ -5,6 +5,10 @@ Turbolinks.BrowserAdapter = class BrowserAdapter {
     this.progressBar = new Turbolinks.ProgressBar
   }
 
+  visitProposed(visit) {
+    visit.start()
+  }
+
   visitStarted(visit) {
     visit.changeHistory()
     visit.issueRequest()

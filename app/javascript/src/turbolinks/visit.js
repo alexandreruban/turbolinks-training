@@ -1,21 +1,21 @@
 Turbolinks.Visit = class Visit {
   constructor(controller, previousLocation, location, action, historyChanged) {
     this.controller = controller
-    this.previousLocation = Turbolinks.Location.box(previousLocation)
-    this.location = Turbolinks.Location.box(location)
     this.action = action
     this.historyChanged = historyChanged
-    this.adapter = this.controller.adapter
+    this.promise = new Promise((resolve, reject) => {
+      this.resolve = resolve
+      this.reject = reject
+      this.previousLocation = Turbolinks.Location.box(previousLocation)
+      this.location = Turbolinks.Location.box(location)
+      this.adapter = this.controller.adapter
+    })
   }
 
   start() {
     if (!this.started) {
-      return this.promise = new Promise((resolve, reject) => {
-        this.resolve = resolve
-        this.reject = reject
-        this.started = true
-        this.adapter.visitStarted(this)
-      })
+      this.started = true
+      this.adapter.visitStarted(this)
     }
   }
 
@@ -26,6 +26,14 @@ Turbolinks.Visit = class Visit {
       }
       this.canceled = true
     }
+  }
+
+  then() {
+    this.promise.then(...arguments)
+  }
+
+  catch() {
+    this.promise.catch(...arguments)
   }
 
   changeHistory(method = "pushHistory") {
@@ -43,10 +51,20 @@ Turbolinks.Visit = class Visit {
     }
   }
 
+  hasSnapshot() {
+    this.controller.hasSnapshotForLocation(this.location)
+  }
+
   restoreSnapshot() {
     if (!this.snapshotRestored) {
       this.saveSnapshot()
       this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
+      if (this.snapshotRestored) {
+        if (typeof this.adapter.visitSnapshotRestored === "function") {
+          this.adapter.visitSnapshotRestored(this)
+        }
+      }
+
       if (!this.shouldIssueRequest()) {
         this.resolve()
       }
@@ -63,6 +81,9 @@ Turbolinks.Visit = class Visit {
         this.controller.loadResponse(this.response)
         this.resolve()
       }
+      if (typeof this.adapter.visitResponseLoaded === "function") {
+        this.adapter.visitResponseLoaded(this)
+      }
     }
   }
 
@@ -74,7 +95,9 @@ Turbolinks.Visit = class Visit {
 
   requestProgressed(progress) {
     this.progress = progress
-    this.adapter.visitRequestProgressed(this)
+    if (typeof this.adapter.visitRequestProgressed === "function") {
+      this.adapter.visitRequestProgressed(this)
+    }
   }
 
   requestCompletedWithResponse(response) {
