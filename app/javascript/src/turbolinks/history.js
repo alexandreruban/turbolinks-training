@@ -27,13 +27,11 @@ Turbolinks.History = class History {
     }
 
     this.update("push", turbo_location)
-    this.delegate.locationChangedByActor(turbo_location, "application")
   }
 
   replace(location) {
     const turbo_location = Turbolinks.Location.box(location)
     this.update("replace", turbo_location)
-    this.delegate.locationChangedByActor(turbo_location, "application")
   }
 
   // Event handlers
@@ -41,7 +39,7 @@ Turbolinks.History = class History {
   onPopState = (event) => {
     if (event.state && event.state.turbolinks) {
       const turbo_location = Turbolinks.Location.box(location)
-      this.delegate.locationChangedByActor(turbo_location, "history")
+      this.delegate.historyPoppedToLocation(turbo_location)
     }
   }
 

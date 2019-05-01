@@ -1,6 +1,7 @@
 Turbolinks.Visit = class Visit {
-  constructor(controller, location, action, historyChanged) {
+  constructor(controller, previousLocation, location, action, historyChanged) {
     this.controller = controller
+    this.previousLocation = Turbolinks.Location.box(previousLocation)
     this.location = Turbolinks.Location.box(location)
     this.action = action
     this.historyChanged = historyChanged
@@ -44,7 +45,8 @@ Turbolinks.Visit = class Visit {
 
   restoreSnapshot() {
     if (!this.snapshotRestored) {
-      this.snapshotRestored = this.controller.restoreSnapshotForVisit(this)
+      this.saveSnapshot()
+      this.snapshotRestored = this.controller.restoreSnapshotForLocationWithAction(this.location, this.action)
       if (!this.shouldIssueRequest()) {
         this.resolve()
       }
@@ -53,6 +55,7 @@ Turbolinks.Visit = class Visit {
 
   loadResponse() {
     if (this.response) {
+      this.saveSnapshot()
       if (this.request.failed) {
         this.controller.loadErrorResponse(this.response)
         this.reject()
@@ -96,5 +99,12 @@ Turbolinks.Visit = class Visit {
 
   hasSnapshot() {
     return this.controller.hasSnapshotForLocation(this.location)
+  }
+
+  saveSnapshot() {
+    if (!this.snapshotSaved) {
+      this.controller.saveSnapshotForLocation(this.previousLocation)
+      this.snapshotSaved = true
+    }
   }
 }

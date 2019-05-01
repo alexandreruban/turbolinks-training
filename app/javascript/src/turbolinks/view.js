@@ -10,11 +10,12 @@ Turbolinks.View = class View{
 
   loadSnapshotHTML(html) {
     const snapshot = Turbolinks.Snapshot.fromHTML(html)
-    this.loadSnapshotByScrollingToSavedPosition(snapshot, false)
+    this.loadSnapshotWithAction(snapshot, "advance")
   }
 
-  loadSnapshotByScrollingToSavedPosition(snapshot, scrollToSavedPosition) {
+  loadSnapshotWithAction(snapshot, action) {
     if (this.loadSnapshot(snapshot)) {
+      const scrollToSavedPosition = action === "restore"
       this.scrollSnapshotToSavedPosition(snapshot, scrollToSavedPosition)
     }
   }
