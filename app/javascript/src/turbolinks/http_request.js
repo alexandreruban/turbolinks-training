@@ -78,11 +78,13 @@ Turbolinks.HttpRequest = class HttpRequest {
   }
 
   endRequest(callback) {
-    this.notifyApplicationAfterRequestEnd()
-    if(typeof callback === "function") {
-      callback.call(this)
+    if (this.xhr) {
+      this.notifyApplicationAfterRequestEnd()
+      if(typeof callback === "function") {
+        callback.call(this)
+      }
+      this.destroy()
     }
-    this.destroy()
   }
 
   setProgress(progress) {
