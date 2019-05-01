@@ -53,15 +53,14 @@ Turbolinks.Controller = class Controller {
 
   // Page snapshots
 
+  hasSnapshotForLocation(location) {
+    return this.cache.has(location)
+  }
+
   saveSnapshotForLocation(location) {
-    console.log("saving snapshot for location", location.toString())
     this.notifyApplicationBeforeSnapshotSave()
     const snapshot = this.view.saveSnapshot()
     this.cache.put(location, snapshot)
-  }
-
-  hasSnapshotForLocation(location) {
-    return this.cache.has(location)
   }
 
   restoreSnapshotForLocationWithAction(location, action) {
@@ -84,6 +83,7 @@ Turbolinks.Controller = class Controller {
 
   historyPoppedToLocation(location) {
     this.startVisit(location, "restore", true)
+    this.location = location
   }
 
   // Event handlers
@@ -151,7 +151,6 @@ Turbolinks.Controller = class Controller {
     if (this.currentVisit) {
       this.currentVisit.cancel()
     }
-    console.log("startVisit previous location = ", this.location.toString(), "location = ", location.toString(), "action = ", action)
     this.currentVisit = new Turbolinks.Visit(this, this.location, location, action, historyChanged)
     this.currentVisit.start().then(() => {
       this.notifyApplicationAfterPageLoad()
